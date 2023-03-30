@@ -31,7 +31,7 @@ namespace Infrastructure.IO
 
         IEnumerable<IEnumerable<T>> ReadLine<T>(StreamReader reader, TryParseHandler<T> handler, char separator);
 
-        T ReadLine<T>(TryParseHandler<T> handler, string prompt);
+        IEnumerable<T> ReadLine<T>(TryParseHandler<T> handler, string prompt);
         
         T ReadLine<T>(TryParseHandler<T> handler, string prompt, string errorMsg);
         

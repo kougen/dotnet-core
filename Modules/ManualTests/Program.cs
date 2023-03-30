@@ -16,11 +16,14 @@ namespace ManualTests
             
             _reader = new Reader(logger, new Writer(logger));
             
-            var test = _reader.ReadLine<TestPersonClass>(TestPersonClass.TryParse).FirstOrDefault();
-            
-            var first = test;
-            Console.WriteLine(first.Age);
-            Console.WriteLine(first.Height);
+            var people = _reader.ReadLine<TestPersonClass>(
+                TestPersonClass.TryParse, 
+                "Kerem az emberek adatait tabulatorral elvalasztva\nNev\tKor\tMagassag\t\n");
+
+            foreach (var person in people)
+            {
+                Console.WriteLine($"{person.Name}: {person.Age} eves es {person.Height}cm magas");
+            }
         }
     }
 }

@@ -83,13 +83,13 @@ namespace Implementation.StandardIOManager
             return convertedList;
         }
 
-        public T ReadLine<T>(IReader.TryParseHandler<T> handler, string prompt)
+        public IEnumerable<T> ReadLine<T>(IReader.TryParseHandler<T> handler, string prompt)
         {
             var reader = new StreamReader(Console.OpenStandardInput());
             var time = DateTime.Now.ToString("HH:mm:ss");
             _writer.Write(Constants.EscapeColors.CYAN, $"[  INPUT: {time}] {prompt}");
             var ans = ReadLine(reader, handler, out _);
-            return ans.FirstOrDefault();
+            return ans;
         }
         
         public T ReadLine<T>(IReader.TryParseHandler<T> handler, string prompt, string errorMsg)
