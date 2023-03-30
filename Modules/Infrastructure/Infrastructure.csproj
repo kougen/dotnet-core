@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <PackageId>joshika39-$(AssemblyName)</PackageId>
+        <Title>Infrastructure</Title>
+        <Version>0.0.3</Version>
+        <Authors>Joshua Hegedus</Authors>
+        <Company>JHost</Company>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <OutputPath>..\bin\Debug\</OutputPath>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <OutputPath>..\bin\Release\</OutputPath>
+    </PropertyGroup>
+
+</Project>
