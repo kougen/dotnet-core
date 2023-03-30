@@ -15,7 +15,7 @@
 
         public static bool TryParse(string line, out TestPersonClass result)
         {
-            var elements = line.Split('\t');
+            var elements = line.Split(' ');
             var testPerson = new TestPersonClass(elements[0], int.Parse(elements[1]), int.Parse(elements[2]));
             result = testPerson;
             return true;

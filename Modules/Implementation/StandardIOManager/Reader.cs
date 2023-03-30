@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Infrastructure;
 using Infrastructure.IO;
 using Infrastructure.Logger;
@@ -10,7 +11,7 @@ namespace Implementation.StandardIOManager
 {
     internal class Reader : IReader
     {
-        
+
         private readonly ILogger _logger;
         private readonly IWriter _writer;
 
@@ -19,7 +20,7 @@ namespace Implementation.StandardIOManager
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _writer = writer ?? throw new ArgumentNullException(nameof(writer));
         }
-        
+
         public IEnumerable<T> ReadLine<T>(StreamReader reader, IReader.TryParseHandler<T> handler, out bool isOkay)
         {
             Console.SetIn(reader);
@@ -27,7 +28,7 @@ namespace Implementation.StandardIOManager
             var lines = new List<string>();
             while (!reader.EndOfStream)
             {
-                var rawInput = Console.ReadLine();
+                var rawInput = ReadLine();
                 _logger.LogWrite($"{rawInput}\n");
                 lines.Add(rawInput);
             }
@@ -56,7 +57,7 @@ namespace Implementation.StandardIOManager
             var lines = new List<string>();
             while (!reader.EndOfStream)
             {
-                var rawInput = Console.ReadLine()!;
+                var rawInput = ReadLine();
                 _logger.LogWrite($"{rawInput}\n");
                 lines.Add(rawInput);
             }
@@ -91,7 +92,7 @@ namespace Implementation.StandardIOManager
             var ans = ReadLine(reader, handler, out _);
             return ans;
         }
-        
+
         public T ReadLine<T>(IReader.TryParseHandler<T> handler, string prompt, string errorMsg)
         {
             var reader = new StreamReader(Console.OpenStandardInput());
@@ -100,25 +101,80 @@ namespace Implementation.StandardIOManager
                 var time = DateTime.Now.ToString("HH:mm:ss");
                 _writer.Write(Constants.EscapeColors.CYAN, $"[  INPUT: {time}] {prompt}");
                 var ans = ReadLine(reader, handler, out var isCorrect);
-        
+
                 if (isCorrect)
                 {
                     return ans.FirstOrDefault();
                 }
-        
+
                 _writer.WriteLine(MessageSeverity.Error, $"{errorMsg} | (Invalid type: {typeof(T)})!");
             }
         }
-        
+
         public IEnumerable<T> ReadLine<T>(IReader.TryParseHandler<T> handler)
         {
             var reader = new StreamReader(Console.OpenStandardInput());
             return ReadLine(reader, handler);
         }
-        
+
         public IEnumerable<T> ReadLine<T>(StreamReader reader, IReader.TryParseHandler<T> handler)
         {
             return ReadLine(reader, handler, out _);
+        }
+
+        private string ReadLine()
+        {
+            var sb = new StringBuilder();
+            string blank = new string(' ', Console.WindowWidth - 1);
+
+            while (true)
+            {
+                var k = Console.ReadKey();
+
+                if((k.Modifiers & ConsoleModifiers.Control) != 0){
+                
+                }
+                switch (k.Key)
+                {
+                    case ConsoleKey.Enter:
+                        Console.WriteLine();
+                        return sb.ToString();
+                    case ConsoleKey.Backspace:
+                    {
+                        if (sb.Length > 0)
+                        {
+                            --sb.Length;
+                        }
+                        break;
+                    }
+                    case ConsoleKey.Tab:
+                        sb.Append('\t');
+                        break;
+                    default:
+                    {
+                        if (k.KeyChar != '\0') // Ignore special keys.
+                        {
+                            sb.Append(k.KeyChar);
+                        }
+                        break;
+                    }
+                }
+
+                Console.Write("\r" + blank);
+                Console.Write("\r" + sb.ToString());
+            }
+        }
+
+        /// <summary>Returns the last 'n' chars of a StringBuilder. </summary>
+        static string lastChars(StringBuilder sb, int n)
+        {
+            n = Math.Min(n, sb.Length);
+            char[] chars = new char[n];
+
+            for (int i = 0; i < n; ++i)
+                chars[i] = sb[i + sb.Length - n];
+
+            return new string(chars);
         }
     }
 }
