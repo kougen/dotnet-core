@@ -28,7 +28,7 @@ namespace Implementation.StandardIOManager
             var lines = new List<string>();
             while (!reader.EndOfStream)
             {
-                var rawInput = ReadLine();
+                var rawInput = Console.ReadLine();
                 _logger.LogWrite($"{rawInput}\n");
                 lines.Add(rawInput);
             }
@@ -57,7 +57,7 @@ namespace Implementation.StandardIOManager
             var lines = new List<string>();
             while (!reader.EndOfStream)
             {
-                var rawInput = ReadLine();
+                var rawInput = Console.ReadLine();
                 _logger.LogWrite($"{rawInput}\n");
                 lines.Add(rawInput);
             }
@@ -68,6 +68,7 @@ namespace Implementation.StandardIOManager
                 var innerList = new List<T>();
 
                 var elements = line.Split(separator).ToList();
+                elements.RemoveAll(string.IsNullOrWhiteSpace);
                 foreach (var element in elements)
                 {
                     if (handler(element, out var result))
