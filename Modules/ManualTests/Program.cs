@@ -1,21 +1,19 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
-using Implementation.Logger;
-using Implementation.StandardIOManager;
+using Implementation.Core;
+using Infrastructure.IO;
+using Unity;
 
 namespace ManualTests
 {
     class Program
     {
-        private static Reader _reader;
+        private static IReader _reader;
         static void Main(string[] args)
         {
             var id = Guid.NewGuid();
-            var logger = new Logger(id, "testLog.txt");
-            
-            _reader = new Reader(logger, new Writer(logger));
-            
+            var c = Bootsrapper.GetDefaultContainer("testLog.txt", id);
+            _reader = c.Resolve<IReader>();
+
             var people = _reader.ReadLine<TestPersonClass>(
                 TestPersonClass.TryParse, 
                 "Kerem az emberek adatait tabulatorral elvalasztva\nNev\tKor\tMagassag\t\n");
