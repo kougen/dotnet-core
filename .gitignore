@@ -760,4 +760,4 @@ fabric.properties
 
 .idea/
 
-.credentials
+.cred*

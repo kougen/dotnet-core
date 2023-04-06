@@ -4,37 +4,41 @@
         <TargetFramework>net5.0</TargetFramework>
         <PackageId>joshika39-$(AssemblyName)</PackageId>
         <Title>Implementation</Title>
-        <Version>0.0.3</Version>
+        <Version>0.0.4</Version>
         <Authors>Joshua Hegedus</Authors>
         <Company>JHost</Company>
         <Description>This is the backend for my base library.</Description>
+        <AssemblyVersion>0.0.4</AssemblyVersion>
+        <FileVersion>0.0.4</FileVersion>
+        <NeutralLanguage>en</NeutralLanguage>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-      <OutputPath>..\bin\Debug\</OutputPath>
+        <OutputPath>..\bin\Debug\</OutputPath>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-      <OutputPath>..\bin\Release\</OutputPath>
+        <OutputPath>..\bin\Release\</OutputPath>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
-	<ItemGroup>
-		<InternalsVisibleTo Include="ImplementationTest" />
-		<InternalsVisibleTo Include="ManualTests" />
-	</ItemGroup>
-
     <ItemGroup>
-      <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
+        <InternalsVisibleTo Include="ImplementationTest"/>
+        <InternalsVisibleTo Include="ManualTests"/>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Unity.Abstractions" Version="5.11.7" />
-      <PackageReference Include="Unity.Container" Version="5.11.11" />
-      <PackageReference Include="Unity.RegistrationByConvention" Version="5.11.1" />
+        <ProjectReference Include="..\Infrastructure\Infrastructure.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="StandardIOManager\Interfaces" />
+        <PackageReference Include="Unity.Abstractions" Version="5.11.7"/>
+        <PackageReference Include="Unity.Container" Version="5.11.11"/>
+        <PackageReference Include="Unity.RegistrationByConvention" Version="5.11.1"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="StandardIOManager\Interfaces"/>
     </ItemGroup>
 
 </Project>
