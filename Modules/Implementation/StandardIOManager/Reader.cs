@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Xml.Linq;
 using Infrastructure;
 using Infrastructure.IO;
 using Infrastructure.Logger;
@@ -25,13 +26,12 @@ namespace Implementation.StandardIOManager
         {
             Console.SetIn(reader);
             isOkay = false;
-            var lines = new List<string>();
-            while (!reader.EndOfStream)
-            {
-                var rawInput = Console.ReadLine();
-                _logger.LogWrite($"{rawInput}\n");
-                lines.Add(rawInput);
-            }
+
+            var rawInput = ReadLine(reader);
+            _logger.LogWrite($"{rawInput}\n");
+            var lines = rawInput.Split('\n').ToList();
+            lines.RemoveAll(string.IsNullOrWhiteSpace);
+            lines.RemoveAll(c => c is "\r\n" or "\n" or "\r" or "\n\r");
 
             var convertedLines = new List<T>();
             foreach (var line in lines)
@@ -40,10 +40,6 @@ namespace Implementation.StandardIOManager
                 if (isOkay)
                 {
                     convertedLines.Add(result);
-                }
-                else
-                {
-                    throw new ArgumentException("Error in line element conversion!");
                 }
             }
 
@@ -57,7 +53,7 @@ namespace Implementation.StandardIOManager
             var lines = new List<string>();
             while (!reader.EndOfStream)
             {
-                var rawInput = Console.ReadLine();
+                var rawInput = ReadLine(reader);
                 _logger.LogWrite($"{rawInput}\n");
                 lines.Add(rawInput);
             }
@@ -69,6 +65,7 @@ namespace Implementation.StandardIOManager
 
                 var elements = line.Split(separator).ToList();
                 elements.RemoveAll(string.IsNullOrWhiteSpace);
+                elements.RemoveAll(c => c is "\r\n" or "\n" or "\r" or "\n\r");
                 foreach (var element in elements)
                 {
                     if (handler(element, out var result))
@@ -123,56 +120,39 @@ namespace Implementation.StandardIOManager
             return ReadLine(reader, handler, out _);
         }
 
-        private string ReadLine()
+        public string ReadLine(StreamReader reader)
         {
+            var fromConsole = !(reader.BaseStream.GetType() == typeof(FileStream));
+            Console.SetIn(reader);
             var sb = new StringBuilder();
-            string blank = new string(' ', Console.WindowWidth - 1);
 
-            while (true)
+            while (!reader.EndOfStream)
             {
-                var k = Console.ReadKey();
-
-                if((k.Modifiers & ConsoleModifiers.Control) != 0){
-                
-                }
-                switch (k.Key)
+                var readInt = reader.Read();
+                var readChar = (char)readInt;
+                sb.Append(readChar);
+                var test1 = LastChars(sb, 2);
+                var test2 = LastChars(sb, 3);
+                if (fromConsole && test2 == "\r\n\r")
                 {
-                    case ConsoleKey.Enter:
-                        Console.WriteLine();
-                        return sb.ToString();
-                    case ConsoleKey.Backspace:
-                    {
-                        if (sb.Length > 0)
-                        {
-                            --sb.Length;
-                        }
-                        break;
-                    }
-                    case ConsoleKey.Tab:
-                        sb.Append('\t');
-                        break;
-                    default:
-                    {
-                        if (k.KeyChar != '\0') // Ignore special keys.
-                        {
-                            sb.Append(k.KeyChar);
-                        }
-                        break;
-                    }
+                    return sb.ToString();
                 }
-
-                Console.Write("\r" + blank);
-                Console.Write("\r" + sb.ToString());
+                else if(fromConsole && test1 is "\r\n" or "\n\r")
+                {
+                    Console.WriteLine("To finish the input press enter again!");
+                }
             }
+
+            return sb.ToString();
         }
 
         /// <summary>Returns the last 'n' chars of a StringBuilder. </summary>
-        static string lastChars(StringBuilder sb, int n)
+        private static string LastChars(StringBuilder sb, int n)
         {
             n = Math.Min(n, sb.Length);
-            char[] chars = new char[n];
+            var chars = new char[n];
 
-            for (int i = 0; i < n; ++i)
+            for (var i = 0; i < n; ++i)
                 chars[i] = sb[i + sb.Length - n];
 
             return new string(chars);

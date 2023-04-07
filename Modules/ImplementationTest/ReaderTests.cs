@@ -43,9 +43,20 @@ namespace ImplementationTest
             using (var reader = new StreamReader(path))
             {
                 var result = _reader.ReadLine<int>(reader, int.TryParse, ' ');
-                reader.Close();
             
                 Assert.Equal(elements, result.FirstOrDefault());    
+            }
+        }
+        
+        [Fact]
+        public void RT_0021_Given_FileWithValidData_When_ReadLine_Then_ReturnsTheString()
+        {
+            using (var reader = new StreamReader(@"Resources\RT\readlineTest.txt"))
+            {
+                var contents = "test String";
+                var result = _reader.ReadLine(reader);
+
+                Assert.Equal(contents, result);    
             }
         }
         
