@@ -79,7 +79,9 @@ jobs:
 
     # Execute all unit tests in the solution
     - name: Execute unit tests
-      run: dotnet test $env:Solution_Name
+      run: |
+        dotnet restore $env:Solution_Name
+        dotnet test $env:Solution_Name
 
     # Restore the application to populate the obj folder with RuntimeIdentifiers
     - name: Restore the application
