@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using Implementation.StandardIOManager;
+using Infrastructure.IO;
 using Infrastructure.IOManager;
 using Infrastructure.Logger;
 using Infrastructure.Navigator;
@@ -32,8 +33,8 @@ namespace Implementation.Core
                 return c.Resolve<Logger.Logger>(new ParameterOverride("logPath", logPath),
                     new ParameterOverride("id", id));
             });
-            container.RegisterType<IIOManager, StandardIOManager.StandardIOManager>();
-            container.RegisterType<IIOManagerFactory, StandardIOManagerFactory>();
+            container.RegisterType<IWriter, Writer>();
+            container.RegisterType<IReader, Reader>();
             container.RegisterType<INavigator, Navigator.Navigator>();
             return container;
         }

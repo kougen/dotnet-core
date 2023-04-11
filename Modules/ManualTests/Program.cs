@@ -1,26 +1,32 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
-using Implementation.Logger;
+using Implementation.Core;
 using Implementation.StandardIOManager;
+using Infrastructure.IO;
+using Infrastructure.Logger;
+using Unity;
 
 namespace ManualTests
 {
     class Program
     {
-        private static Reader _reader;
+        private static IReader _reader;
+        private static IWriter _writer;
         static void Main(string[] args)
         {
             var id = Guid.NewGuid();
-            var logger = new Logger(id, "testLog.txt");
+            var c = Bootsrapper.GetDefaultContainer("testLog.txt", id);
+            _reader = c.Resolve<IReader>();
+            _writer = c.Resolve<IWriter>();
+
+            var people = _reader.ReadLine<TestPersonClass>(
+                TestPersonClass.TryParse, 
+                "Kerem az emberek adatait tabulatorral elvalasztva\nNev\tKor\tMagassag\t\n");
             
-            _reader = new Reader(logger, new Writer(logger));
-            
-            var test = _reader.ReadLine<TestPersonClass>(TestPersonClass.TryParse).FirstOrDefault();
-            
-            var first = test;
-            Console.WriteLine(first.Age);
-            Console.WriteLine(first.Height);
+            foreach (var person in people)
+            {
+                Console.WriteLine($"{person.Name}: {person.Age} eves es {person.Height}cm magas");
+            }
         }
     }
 }
