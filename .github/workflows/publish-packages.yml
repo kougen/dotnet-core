@@ -2,14 +2,11 @@ name: CD
 
 
 on:
-  # workflow_run:
-  #   workflows: ["CI"]
-  #   branches: [ master ]
-  #   types:
-  #     - completed
-  push:
-    branches:
-    - master
+  workflow_run:
+    workflows: ["CI"]
+    branches: [ master ]
+    types:
+      - completed
 
 jobs:
   build:
@@ -17,7 +14,6 @@ jobs:
     env:
       BUILD_CONFIG: 'Release'
       SOLUTION: './Solution/Modules.sln'
-      MESSAGE: $(git log -1 --no-merges --pretty='format:%C(auto)%s')
 
     runs-on: windows-latest
 
@@ -31,8 +27,8 @@ jobs:
       run: |
         Get-ChildItem
         Import-Module .\Solution\Tools\GetBuildVersion.psm1
-        Write-Host $env:MESSAGE
-        $version = GetBuildVersion -VersionString $env:MESSAGE
+        Write-Host $(git log -1 --no-merges --pretty='format:%C(auto)%s')
+        $version = GetBuildVersion -VersionString $(git log -1 --no-merges --pretty='format:%C(auto)%s')
         echo "BUILD_VERSION=$version" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
       shell: pwsh
 
@@ -54,7 +50,7 @@ jobs:
       run: dotnet test $env:SOLUTION /p:Configuration=$env:BUILD_CONFIG --no-restore --no-build --verbosity normal
       
     - name: Publish
-      if: startsWith(github.ref, 'refs/heads/release')
+      if: startsWith(github.ref, 'refs/heads/master')
       run: |
         dotnet nuget push **\*.nupkg --source 'https://api.nuget.org/v3/index.json' --api-key ${{secrets.NUGET_API_KEY}}
         dotnet nuget push **\*.nupkg --source 'https://nuget.pkg.github.com/joshika39/index.json' --api-key ${{secrets.GIT_API_KEY}}
