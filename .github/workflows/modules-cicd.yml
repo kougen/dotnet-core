@@ -38,7 +38,7 @@ jobs:
       run: nuget restore $env:SOLUTION
 
     - name: Build
-      run: dotnet build $env:SOLUTION --configuration $BUILD_CONFIG --no-restore
+      run: dotnet build $env:SOLUTION --configuration $env:BUILD_CONFIG --no-restore
 
     - name: Run tests
       run: dotnet test $env:SOLUTION /p:Configuration=$env:BUILD_CONFIG --no-restore --no-build --verbosity normal
