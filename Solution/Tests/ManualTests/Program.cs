@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using Implementation.Core;
-using Implementation.StandardIOManager;
 using Infrastructure.IO;
 using Infrastructure.Logger;
 using Unity;

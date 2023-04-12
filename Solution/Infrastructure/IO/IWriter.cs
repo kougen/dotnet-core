@@ -1,6 +1,4 @@
-﻿using Infrastructure;
-
-namespace Implementation.StandardIOManager
+﻿namespace Infrastructure.IO
 {
     public interface IWriter
     {

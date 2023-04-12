@@ -34,4 +34,8 @@
         <PackageReference Include="Unity.RegistrationByConvention" Version="5.11.1" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="IO\Factories\" />
+    </ItemGroup>
+
 </Project>

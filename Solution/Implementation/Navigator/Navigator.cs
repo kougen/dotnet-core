@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Implementation.StandardIOManager;
-using Infrastructure.IOManager;
+using Infrastructure.IO;
 using Infrastructure.Navigator;
 
 namespace Implementation.Navigator

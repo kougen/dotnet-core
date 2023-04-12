@@ -1,8 +1,9 @@
 ﻿using System;
 using Infrastructure;
+using Infrastructure.IO;
 using Infrastructure.Logger;
 
-namespace Implementation.StandardIOManager
+namespace Implementation.IO
 {
     public class Writer : IWriter
     {

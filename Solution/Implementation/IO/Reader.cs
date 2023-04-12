@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Xml.Linq;
 using Infrastructure;
 using Infrastructure.IO;
 using Infrastructure.Logger;
 
-namespace Implementation.StandardIOManager
+namespace Implementation.IO
 {
     internal class Reader : IReader
     {

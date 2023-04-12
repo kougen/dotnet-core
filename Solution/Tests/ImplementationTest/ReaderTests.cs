@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Implementation.IO;
 using Implementation.Logger;
-using Implementation.StandardIOManager;
 using Xunit;
 
 namespace ImplementationTest
