@@ -28,6 +28,8 @@ jobs:
       run: |
         Get-ChildItem
         Import-Module .\Solution\Tools\GetBuildVersion.psm1
+        Write-Output ($env:MESSAGE)
+        Write-Output (${{ github.event.head_commit.message }})
         Write-Host $env:MESSAGE
         $version = GetBuildVersion -VersionString $env:MESSAGE
         echo "BUILD_VERSION=$version" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
