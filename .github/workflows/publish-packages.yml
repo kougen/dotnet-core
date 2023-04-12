@@ -2,11 +2,14 @@ name: CD
 
 
 on:
-  workflow_run:
-    workflows: ["CI"]
-    branches: [ master ]
-    types:
-      - completed
+  # workflow_run:
+  #   workflows: ["CI"]
+  #   branches: [ master ]
+  #   types:
+  #     - completed
+  push:
+    branches:
+    - master
 
 jobs:
   build:
@@ -14,7 +17,7 @@ jobs:
     env:
       BUILD_CONFIG: 'Release'
       SOLUTION: './Solution/Modules.sln'
-      MESSAGE: ${{ github.event.head_commit.message }}
+      MESSAGE: $(git log -1 --no-merges --pretty='format:%C(auto)%s')
 
     runs-on: windows-latest
 
@@ -28,7 +31,6 @@ jobs:
       run: |
         Get-ChildItem
         Import-Module .\Solution\Tools\GetBuildVersion.psm1
-        Write-Output ($env:MESSAGE)
         Write-Host $env:MESSAGE
         $version = GetBuildVersion -VersionString $env:MESSAGE
         echo "BUILD_VERSION=$version" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
@@ -37,7 +39,7 @@ jobs:
     - name: Install .NET Core
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 6.0.x
+        dotnet-version: 5.0.x
 
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v1.0.2
