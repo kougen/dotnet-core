@@ -1,3 +1,3 @@
 # CsTools
 
-[![CI](https://github.com/joshika39/cs-tools/actions/workflows/main.yml/badge.svg)](https://github.com/joshika39/cs-tools/actions/workflows/main.yml)
+[![CI-CD](https://github.com/joshika39/cs-tools/actions/workflows/modules-cicd.yml/badge.svg)](https://github.com/joshika39/cs-tools/actions/workflows/modules-cicd.yml)
