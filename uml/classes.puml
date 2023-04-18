@@ -1,0 +1,15 @@
+@startuml IO
+
+' delegate TryParseHandler {
+
+' }
+
+interface IReader{
+	+ReadLine(StreamReader streamReader, TryParseHandler<T> handler, out bool isOkay): T 
+	.. User friendly methods ..
+	+ReadLine(handler: TryHandler, ): T 
+    +ReadLine<T>(TryParseHandler<T> handler, string prompt) : IEnumerable<T> 
+    +ReadLine<T>(TryParseHandler<T> handler, string prompt, string errorMsg) : T
+}
+
+@enduml
