@@ -30,6 +30,8 @@ namespace Infrastructure.IO
         /// <exception cref="InvalidOperationException">Exception being thrown when the conversion is unsuccessful.</exception>
         IEnumerable<T> ReadLine<T>(StreamReader streamReader, TryParseHandler<T> handler, out bool isOkay, params char[] separators);
 
+        T ReadLine<T>(StreamReader streamReader, IReader.TryParseHandler<T> handler, out bool isOkay);
+
         
         #region ReadLine
         T ReadLine<T>(TryParseHandler<T> handler, string prompt);

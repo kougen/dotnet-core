@@ -4,6 +4,7 @@ interface IReader{
     +TryParseHandler<T>(string value, out T result) <<delegate bool>>
 
     +ReadLine<T>(StreamReader streamReader, TryParseHandler<T> handler, out bool isOkay, params char[] separators) : IEnumerable<T> 
+    +ReadLine<T>(StreamReader streamReader, TryParseHandler<T> handler, out bool isOkay) : T
 
     .. Without Custom StreamReader ..
     +ReadLine<T>(TryParseHandler<T> handler, string prompt) : T
