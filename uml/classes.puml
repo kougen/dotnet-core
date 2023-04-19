@@ -1,31 +1,26 @@
 @startuml IO
 
-' delegate TryParseHandler {
-
-' }
-
 interface IReader{
-	    +TryParseHandler<T>(string value, out T result) <<delegate bool>>
+    +TryParseHandler<T>(string value, out T result) <<delegate bool>>
 
-        +ReadLine<T>(StreamReader streamReader, TryParseHandler<T> handler, char[] separators, out bool isOkay) : IEnumerable<T> 
-        +ReadLine<T>(StreamReader streamReader, TryParseHandler<T> handler, char[] separators) : IEnumerable<T>
-        +ReadLine<T>(StreamReader streamReader, TryParseHandler<T> handler, char separator) : IEnumerable<T>
+    +ReadLine<T>(StreamReader streamReader, TryParseHandler<T> handler, out bool isOkay, params char[] separators) : IEnumerable<T> 
 
-		.. Primairly Console Input ..
-    	+ReadLine<T>(TryParseHandler<T> handler, string prompt) : T
-       	+ReadLine<T>(TryParseHandler<T> handler, char separator, string prompt) : IEnumerable<T>
-       	+ReadLine<T>(TryParseHandler<T> handler, char[] separators, string prompt) : IEnumerable<T>
-        +ReadLine<T>(TryParseHandler<T> handler, string prompt, string errorMsg) : T
-        +ReadLine<T>(TryParseHandler<T> handler, char separator, string prompt, string errorMsg) : IEnumerable<T>
-        +ReadLine<T>(TryParseHandler<T> handler, char[] separators,string prompt, string errorMsg) : IEnumerable<T>
-        +ReadLine<T>(TryParseHandler<T> handler) : T 
-        +ReadLine<T>(TryParseHandler<T> handler, char separator) : IEnumerable<T> 
-        +ReadLine<T>(TryParseHandler<T> handler, char[] separators) : IEnumerable<T> 
+    .. Without Custom StreamReader ..
+    +ReadLine<T>(TryParseHandler<T> handler, string prompt) : T
+    +ReadLine<T>(TryParseHandler<T> handler, string prompt, params char[] separators) : IEnumerable<T>
+    +ReadLine<T>(TryParseHandler<T> handler, string prompt, string errorMsg) : T
+    +ReadLine<T>(TryParseHandler<T> handler, string prompt, string errorMsg, params char[] separators) : IEnumerable<T>
+    
+    +ReadLine<T>(TryParseHandler<T> handler) : T 
+    +ReadLine<T>(TryParseHandler<T> handler, params char[] separators) : IEnumerable<T> 
 
-		.. Primairly from Custom StreamReader Input ..
-        +ReadLine<T>(StreamReader streamReader, TryParseHandler<T> handler) : T
-        +ReadLine<T>(StreamReader streamReader, TryParseHandler<T> handler, char separator) : IEnumerable<T>
-        +ReadLine<T>(StreamReader streamReader, TryParseHandler<T> handler, char[] separators) : IEnumerable<T>
+    .. With Custom StreamReader ..
+    +ReadLine<T>(StreamReader streamReader, TryParseHandler<T> handler) : T
+    +ReadLine<T>(StreamReader streamReader, TryParseHandler<T> handler, params char separators) : IEnumerable<T>
+
+    +ReadAllLines<T>(string prompt) : string
+    +ReadAllLines<T>(StreamReader streamReader, TryParseHandler<T> handler, out bool isOkay) : IEnumerable<T>
+    +ReadAllLines<T>(StreamReader streamReader, TryParseHandler<T> handler, out bool isOkay, params char separators) : IEnumerable<IEnumerable<T>>
 }
 
 @enduml

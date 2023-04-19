@@ -21,15 +21,14 @@ namespace Implementation.IO
             _writer = writer ?? throw new ArgumentNullException(nameof(writer));
         }
 
-        public IEnumerable<T> ReadLine<T>(StreamReader streamReader, IReader.TryParseHandler<T> handler, out bool isOkay)
+        public IEnumerable<T> ReadLine<T>(StreamReader streamReader, IReader.TryParseHandler<T> handler, out bool isOkay, params char[] separators)
         {
             Console.SetIn(streamReader);
             isOkay = false;
 
             var rawInput = ReadLine(streamReader);
             _logger.LogWrite($"{rawInput}\n");
-            var lines = rawInput.Split('\n').ToList();
-            lines.RemoveAll(string.IsNullOrWhiteSpace);
+            var lines = rawInput.Split(separators, StringSplitOptions.RemoveEmptyEntries).ToList();
             lines.RemoveAll(c => c is "\r\n" or "\n" or "\r" or "\n\r");
 
             var convertedLines = new List<T>();
@@ -45,52 +44,21 @@ namespace Implementation.IO
             return convertedLines;
         }
 
-        public IEnumerable<IEnumerable<T>> ReadLine<T>(StreamReader streamReader, IReader.TryParseHandler<T> handler, char separator)
-        {
-            return ReadLine(streamReader, handler, new[] { separator });
-        }
-
-        public IEnumerable<IEnumerable<T>> ReadLine<T>(StreamReader streamReader, IReader.TryParseHandler<T> handler, char[] separators)
-        {
-            Console.SetIn(streamReader);
-
-            var lines = new List<string>();
-            while (!streamReader.EndOfStream)
-            {
-                var rawInput = ReadLine(streamReader);
-                _logger.LogWrite($"{rawInput}\n");
-                lines.Add(rawInput);
-            }
-
-            var convertedList = new List<IEnumerable<T>>();
-            foreach (var line in lines)
-            {
-                var innerList = new List<T>();
-
-                var elements = line.Split(separators, StringSplitOptions.RemoveEmptyEntries).ToList();
-                elements.RemoveAll(c => c is "\r\n" or "\n" or "\r" or "\n\r");
-                foreach (var element in elements)
-                {
-                    if (handler(element, out var result))
-                    {
-                        innerList.Add(result);
-                    }
-                    else
-                    {
-                        throw new ArgumentException("Error in line element conversion!");
-                    }
-                }
-                convertedList.Add(innerList);
-            }
-            return convertedList;
-        }
-
-        public IEnumerable<T> ReadLine<T>(IReader.TryParseHandler<T> handler, string prompt)
+        public T ReadLine<T>(IReader.TryParseHandler<T> handler, string prompt)
         {
             var reader = new StreamReader(Console.OpenStandardInput());
             var time = DateTime.Now.ToString("HH:mm:ss");
             _writer.Write(Constants.EscapeColors.CYAN, $"[  INPUT: {time}] {prompt}");
-            var ans = ReadLine(reader, handler, out _);
+            var ans = ReadLine(reader, handler, out _).FirstOrDefault();
+            return ans;
+        }
+        
+        public IEnumerable<T> ReadLine<T>(IReader.TryParseHandler<T> handler, string prompt, params char[] separators)
+        {
+            var reader = new StreamReader(Console.OpenStandardInput());
+            var time = DateTime.Now.ToString("HH:mm:ss");
+            _writer.Write(Constants.EscapeColors.CYAN, $"[  INPUT: {time}] {prompt}");
+            var ans = ReadLine(reader, handler, out _, separators);
             return ans;
         }
 
@@ -111,16 +79,78 @@ namespace Implementation.IO
                 _writer.WriteLine(MessageSeverity.Error, $"{errorMsg} | (Invalid type: {typeof(T)})!");
             }
         }
+        
+        public IEnumerable<T> ReadLine<T>(IReader.TryParseHandler<T> handler, string prompt, string errorMsg, params char[] separators)
+        {
+            var reader = new StreamReader(Console.OpenStandardInput());
+            while (true)
+            {
+                var time = DateTime.Now.ToString("HH:mm:ss");
+                _writer.Write(Constants.EscapeColors.CYAN, $"[  INPUT: {time}] {prompt}");
+                var ans = ReadLine(reader, handler, out var isCorrect);
 
-        public IEnumerable<T> ReadLine<T>(IReader.TryParseHandler<T> handler)
+                if (isCorrect)
+                {
+                    return ans;
+                }
+
+                _writer.WriteLine(MessageSeverity.Error, $"{errorMsg} | (Invalid type: {typeof(T)})!");
+            }
+        }
+
+        public T ReadLine<T>(IReader.TryParseHandler<T> handler)
         {
             var reader = new StreamReader(Console.OpenStandardInput());
             return ReadLine(reader, handler);
         }
-
-        public IEnumerable<T> ReadLine<T>(StreamReader streamReader, IReader.TryParseHandler<T> handler)
+        
+        public IEnumerable<T> ReadLine<T>(IReader.TryParseHandler<T> handler, params char[] separators)
         {
-            return ReadLine(streamReader, handler, out _);
+            var reader = new StreamReader(Console.OpenStandardInput());
+            return ReadLine(reader, handler, separators);
+        }
+
+        public T ReadLine<T>(StreamReader streamReader, IReader.TryParseHandler<T> handler)
+        {
+            return ReadLine(streamReader, handler, out _).FirstOrDefault();
+        }
+        
+        public IEnumerable<T> ReadLine<T>(StreamReader streamReader, IReader.TryParseHandler<T> handler, params char[] separators)
+        {
+            return ReadLine(streamReader, handler, out _, separators);
+        }
+
+        public string ReadAllLines(string prompt)
+        {
+            var streamReader = new StreamReader(Console.OpenStandardInput());
+            var time = DateTime.Now.ToString("HH:mm:ss");
+            _writer.WriteLine(MessageSeverity.Info, "To finish entering your long text input enter the 'end of file' character. (Usually Ctrl + Z on windows)");
+            _writer.Write(Constants.EscapeColors.CYAN, $"[  INPUT: {time}] {prompt}");
+
+
+            return ReadLine(streamReader);
+        }
+
+        public IEnumerable<T> ReadAllLines<T>(StreamReader streamReader, IReader.TryParseHandler<T> handler)
+        {
+            var items = new List<T>();
+            while (!streamReader.EndOfStream)
+            {
+                items.Add(ReadLine(streamReader, handler));
+            }
+
+            return items;
+        }
+
+        public IEnumerable<IEnumerable<T>> ReadAllLines<T>(StreamReader streamReader, IReader.TryParseHandler<T> handler, params char[] separators)
+        {
+            var items = new List<IEnumerable<T>>();
+            while (!streamReader.EndOfStream)
+            {
+                items.Add(ReadLine(streamReader, handler, separators));
+            }
+
+            return items;
         }
 
         public string ReadLine(StreamReader streamReader)
@@ -128,25 +158,15 @@ namespace Implementation.IO
             var fromConsole = !(streamReader.BaseStream.GetType() == typeof(FileStream));
             Console.SetIn(streamReader);
             var sb = new StringBuilder();
-            var test1 = "";
-            while ((test1 is not "\r\n" or "\n\r" && !streamReader.EndOfStream) || fromConsole)
+            while (!streamReader.EndOfStream/* || fromConsole*/)
             {
                 var readInt = streamReader.Read();
                 var readChar = (char)readInt;
                 sb.Append(readChar);
-                test1 = LastChars(sb, 2);
-                var test2 = LastChars(sb, 3);
-                
-                if (fromConsole && test2 == "\r\n\r")
-                {
-                    return sb.ToString();
-                }
-                
-                if(fromConsole && test1 is "\r\n" or "\n\r")
-                {
-                    Console.WriteLine("To finish the input press enter again!");
-                }
-                else if (!fromConsole && test1 is "\r\n" or "\n\r" )
+                var test1 = LastChars(sb, 2);
+
+
+                if (!fromConsole && test1 is "\r\n" or "\n\r" )
                 {
                     return sb.ToString();
                 }
@@ -155,6 +175,7 @@ namespace Implementation.IO
             return sb.ToString();
         }
 
+        
         /// <summary>Returns the last 'n' chars of a StringBuilder. </summary>
         private static string LastChars(StringBuilder sb, int n)
         {

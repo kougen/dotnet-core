@@ -19,6 +19,7 @@ namespace Infrastructure.IO
         /// <param name="streamReader"></param>
         /// <param name="handler">A type parser method</param>
         /// <param name="isOkay"></param>
+        /// <param name="separators"></param>
         /// <example>
         /// This shows a conversion to <c>int</c>.
         /// <code>var age = ReadLine&lt;int&gt;(int.TryParse);</code>
@@ -27,18 +28,26 @@ namespace Infrastructure.IO
         /// <seealso cref="Console.ReadLine()"/>
         /// <returns>The converted Type passed with the type parameter.</returns>
         /// <exception cref="InvalidOperationException">Exception being thrown when the conversion is unsuccessful.</exception>
-        IEnumerable<T> ReadLine<T>(StreamReader streamReader, TryParseHandler<T> handler, out bool isOkay);
+        IEnumerable<T> ReadLine<T>(StreamReader streamReader, TryParseHandler<T> handler, out bool isOkay, params char[] separators);
 
-        IEnumerable<IEnumerable<T>> ReadLine<T>(StreamReader streamReader, TryParseHandler<T> handler, char[] separators);
         
-        IEnumerable<IEnumerable<T>> ReadLine<T>(StreamReader streamReader, TryParseHandler<T> handler, char separator);
-
-        IEnumerable<T> ReadLine<T>(TryParseHandler<T> handler, string prompt);
-        
+        #region ReadLine
+        T ReadLine<T>(TryParseHandler<T> handler, string prompt);
+        IEnumerable<T> ReadLine<T>(TryParseHandler<T> handler, string prompt, params char[] separators);
         T ReadLine<T>(TryParseHandler<T> handler, string prompt, string errorMsg);
+        IEnumerable<T> ReadLine<T>(TryParseHandler<T> handler, string prompt, string errorMsg, params char[] separators);
+        T ReadLine<T>(TryParseHandler<T> handler);
+        IEnumerable<T> ReadLine<T>(TryParseHandler<T> handler, params char[] separators);
+        T ReadLine<T>(StreamReader streamReader, TryParseHandler<T> handler);
+        IEnumerable<T> ReadLine<T>(StreamReader streamReader, TryParseHandler<T> handler, params char[] separators);
+        #endregion
         
-        IEnumerable<T> ReadLine<T>(TryParseHandler<T> handler);
+        #region ReadAllLines
+        string ReadAllLines(string prompt);
+        IEnumerable<T> ReadAllLines<T>(StreamReader streamReader, TryParseHandler<T> handler);
+        IEnumerable<IEnumerable<T>> ReadAllLines<T>(StreamReader streamReader, TryParseHandler<T> handler, params char[] separators);
+        #endregion
+
         
-        IEnumerable<T> ReadLine<T>(StreamReader streamReader, TryParseHandler<T> handler);
     }
 }
