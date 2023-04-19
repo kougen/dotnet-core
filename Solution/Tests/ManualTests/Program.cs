@@ -22,9 +22,11 @@ namespace ManualTests
             var ioFactory = new IOFactory();
             _writer = ioFactory.CreateWriter(logger);
             _reader = ioFactory.CreateReader(logger, _writer);
-            
-            var r = _reader.ReadLine<int>(int.TryParse).FirstOrDefault();
-            _writer.WriteLine(r.ToString());
+
+            // var r = _reader.ReadLine<int>(int.TryParse);
+            // _writer.WriteLine(r.ToString());
+
+            var test = _reader.ReadAllLines("Adjon meg hosszu szoveget");
             
             var nav = new NavigatorFactory().CreateNavigator(_writer, 
                 new List<INavigatorElement>() { new NavigatorElement("asd", () => { }) });

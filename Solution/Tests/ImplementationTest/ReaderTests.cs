@@ -23,7 +23,7 @@ namespace ImplementationTest
 
             var result = reader.ReadLine<int>(stream, int.TryParse);
 
-            Assert.Equal(expected, result.FirstOrDefault());
+            Assert.Equal(expected, result);
         }
 
         [Theory]
@@ -35,31 +35,7 @@ namespace ImplementationTest
 
             var result = reader.ReadLine<int>(stream, int.TryParse, ' ');
 
-            Assert.Equal(elements, result.FirstOrDefault());
-        }
-
-        [Theory]
-        [MemberData(nameof(RT_0015_MemberData))]
-        public void RT_0015_Given_FileWithValidData_When_ReadLineWithMultipleValuesAndMultipleLines_Then_ReturnsCorrectValue(string path, IEnumerable<IEnumerable<int>> elements)
-        {
-            var reader = InitializeReader();
-            using var stream = new StreamReader(path);
-            var result = reader.ReadLine<int>(stream, int.TryParse, ' ');
-
             Assert.Equal(elements, result);
-
-        }
-        
-        [Theory]
-        [MemberData(nameof(RT_0031_MemberData))]
-        public void RT_0031_Given_FileWithValidDataWithDifferentSeparator_When_ReadLineIsCalled_Then_ReturnsCorrectValue(string path, IEnumerable<IEnumerable<int>> elements)
-        {
-            var reader = InitializeReader();
-            using var stream = new StreamReader(path);
-            var result = reader.ReadLine<int>(stream, int.TryParse, new []{' ', '\t'});
-
-            Assert.Equal(elements, result);
-
         }
 
         [Fact]
@@ -74,6 +50,42 @@ namespace ImplementationTest
             Assert.Equal(contents, result);
 
         }
+        
+        [Theory]
+        [MemberData(nameof(RT_0031_MemberData))]
+        public void RT_0031_Given_FileWithValidDataWithDifferentSeparator_When_ReadLineIsCalled_Then_ReturnsCorrectValue(string path, IEnumerable<int> elements)
+        {
+            var reader = InitializeReader();
+            using var stream = new StreamReader(path);
+            var result = reader.ReadLine<int>(stream, int.TryParse, ' ', '\t');
+
+            Assert.Equal(elements, result);
+
+        }
+        
+        [Theory]
+        [MemberData(nameof(RT_0041_MemberData))]
+        public void RT_0041_Given_FileWithValidData_When_ReadAllLinesForOneValue_Then_ReturnsCorrectValue(string path, IEnumerable<int> elements)
+        {
+            var reader = InitializeReader();
+            using var stream = new StreamReader(path);
+            var result = reader.ReadAllLines<int>(stream, int.TryParse);
+
+            Assert.Equal(elements, result);
+
+        }
+        
+        [Theory]
+        [MemberData(nameof(RT_0051_MemberData))]
+        public void RT_0051_Given_FileWithValidData_When_ReadAllLinesForMultipleValues_Then_ReturnsCorrectValue(string path, IEnumerable<IEnumerable<int>> elements)
+        {
+            var reader = InitializeReader();
+            using var stream = new StreamReader(path);
+            var result = reader.ReadAllLines<int>(stream, int.TryParse, ' ', '\t');
+
+            Assert.Equal(elements, result);
+
+        }
 
         public static IEnumerable<object[]> RT_0011_MemberData()
         {
@@ -81,19 +93,25 @@ namespace ImplementationTest
             yield return new object[] { @"Resources\RT\0002_1.txt", new List<int> { 4, 2, 5, 8 } };
         }
 
-        public static IEnumerable<object[]> RT_0015_MemberData()
-        {
-            yield return new object[] { @"Resources\RT\0015_0.txt", new List<List<int>> { new() { 4, 2, 5, 8 }, new() { 1, 1, 1 } } };
-            yield return new object[] { @"Resources\RT\0015_1.txt", new List<List<int>> { new() { 4, 2, 5, 8 }, new() { 1, 2, 3 }, new() { 7, 8, 9, 4, 5 } } };
-        }
-        
         public static IEnumerable<object[]> RT_0031_MemberData()
         {
-            yield return new object[] { @"Resources\RT\0031_0.txt", new List<List<int>> { new() { 4, 2, 5, 8 }, new() { 1, 1, 1 } } };
-            yield return new object[] { @"Resources\RT\0031_1.txt", new List<List<int>> { new() { 4, 2, 5, 8 }, new() { 1, 2, 3 }, new() { 7, 8, 9, 4, 5 } } };
+            yield return new object[] { @"Resources\RT\0031_0.txt", new List<int> {  1, 2, 3  } };
+            yield return new object[] { @"Resources\RT\0031_1.txt", new List<int> {  4, 2, 5, 8 } };
         }
         
-        private Reader InitializeReader()
+        public static IEnumerable<object[]> RT_0041_MemberData()
+        {
+            yield return new object[] { @"Resources\RT\0041_0.txt", new List<int> {  4, 2, 5, 8  } };
+            yield return new object[] { @"Resources\RT\0041_1.txt", new List<int> {  1, 2, 3 } };
+        }
+        
+        public static IEnumerable<object[]> RT_0051_MemberData()
+        {
+            yield return new object[] { @"Resources\RT\0051_0.txt", new List<List<int>> { new() { 4, 2, 5, 8 }, new() { 1, 1, 1 } } };
+            yield return new object[] { @"Resources\RT\0051_1.txt", new List<List<int>> { new() { 4, 2, 5, 8 }, new() { 1, 2, 3 }, new() { 7, 8, 9, 4, 5 } } };
+        }
+        
+        private static Reader InitializeReader()
         {
             var id = Guid.NewGuid();
             using var logger = new LoggerFactory().CreateLogger(id);

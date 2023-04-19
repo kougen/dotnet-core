@@ -1,0 +1,26 @@
+@startuml IO
+
+interface IReader{
+    +TryParseHandler<T>(string value, out T result) <<delegate bool>>
+
+    +ReadLine<T>(StreamReader streamReader, TryParseHandler<T> handler, out bool isOkay, params char[] separators) : IEnumerable<T> 
+
+    .. Without Custom StreamReader ..
+    +ReadLine<T>(TryParseHandler<T> handler, string prompt) : T
+    +ReadLine<T>(TryParseHandler<T> handler, string prompt, params char[] separators) : IEnumerable<T>
+    +ReadLine<T>(TryParseHandler<T> handler, string prompt, string errorMsg) : T
+    +ReadLine<T>(TryParseHandler<T> handler, string prompt, string errorMsg, params char[] separators) : IEnumerable<T>
+    
+    +ReadLine<T>(TryParseHandler<T> handler) : T 
+    +ReadLine<T>(TryParseHandler<T> handler, params char[] separators) : IEnumerable<T> 
+
+    .. With Custom StreamReader ..
+    +ReadLine<T>(StreamReader streamReader, TryParseHandler<T> handler) : T
+    +ReadLine<T>(StreamReader streamReader, TryParseHandler<T> handler, params char separators) : IEnumerable<T>
+
+    +ReadAllLines<T>(string prompt) : string
+    +ReadAllLines<T>(StreamReader streamReader, TryParseHandler<T> handler, out bool isOkay) : IEnumerable<T>
+    +ReadAllLines<T>(StreamReader streamReader, TryParseHandler<T> handler, out bool isOkay, params char separators) : IEnumerable<IEnumerable<T>>
+}
+
+@enduml
