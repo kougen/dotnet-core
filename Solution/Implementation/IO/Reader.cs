@@ -169,7 +169,7 @@ namespace Implementation.IO
             return items;
         }
 
-        public string ReadLine(StreamReader streamReader)
+        public static string ReadLine(StreamReader streamReader)
         {
             var fromConsole = !(streamReader.BaseStream.GetType() == typeof(FileStream));
             Console.SetIn(streamReader);

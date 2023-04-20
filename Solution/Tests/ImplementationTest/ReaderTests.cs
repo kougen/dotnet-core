@@ -47,7 +47,7 @@ namespace ImplementationTest
             using var stream = new StreamReader(@"Resources\RT\readlineTest.txt");
             const string contents = "test String";
 
-            var result = reader.ReadLine(stream);
+            var result = Reader.ReadLine(stream);
 
             Assert.Equal(contents, result);
         }

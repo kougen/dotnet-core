@@ -21,13 +21,6 @@ namespace Implementation.Logger
             _id = id;
             _logPath = $"{id.ToString().Replace("-", "")}.txt";
             _isDisposed = false;
-            // if (!File.Exists(_logPath))
-            // {
-            //     using (var streamWriter = new StreamWriter(File.Open(_logPath, FileMode.Create), Encoding.ASCII))
-            //     {
-            //         streamWriter.AutoFlush = true;
-            //     }
-            // }
         }
 
         ~Logger()

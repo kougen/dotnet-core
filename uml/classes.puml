@@ -3,25 +3,113 @@
 interface IReader{
     +TryParseHandler<T>(string value, out T result) <<delegate bool>>
 
-    +ReadLine<T>(StreamReader streamReader, TryParseHandler<T> handler, out bool isOkay, params char[] separators) : IEnumerable<T> 
-    +ReadLine<T>(StreamReader streamReader, TryParseHandler<T> handler, out bool isOkay) : T
+    +ReadLine<T>(streamReader: StreamReader, handler: TryParseHandler<T>, params char[] separators) :bool×IEnumerable<T> 
+    +ReadLine<T>(streamReader: StreamReader, handler: TryParseHandler<T>) : bool×T
 
     .. Without Custom StreamReader ..
-    +ReadLine<T>(TryParseHandler<T> handler, string prompt) : T
-    +ReadLine<T>(TryParseHandler<T> handler, string prompt, params char[] separators) : IEnumerable<T>
-    +ReadLine<T>(TryParseHandler<T> handler, string prompt, string errorMsg) : T
-    +ReadLine<T>(TryParseHandler<T> handler, string prompt, string errorMsg, params char[] separators) : IEnumerable<T>
-    
-    +ReadLine<T>(TryParseHandler<T> handler) : T 
-    +ReadLine<T>(TryParseHandler<T> handler, params char[] separators) : IEnumerable<T> 
+    +ReadLine<T>(handler: TryParseHandler<T>, prompt: string) : T
+    +ReadLine<T>(handler: TryParseHandler<T>, prompt: string, params char[] separators) : IEnumerable<T>
+    +ReadLine<T>(handler: TryParseHandler<T>, prompt: string, errorMsg: string) : T
+    +ReadLine<T>(handler: TryParseHandler<T>, prompt: string, errorMsg: string, params char[] separators) : IEnumerable<T>
+    +ReadLine<T>(handler: TryParseHandler<T>) : T 
+    +ReadLine<T>(handler: TryParseHandler<T>, params char[] separators) : IEnumerable<T> 
 
     .. With Custom StreamReader ..
-    +ReadLine<T>(StreamReader streamReader, TryParseHandler<T> handler) : T
-    +ReadLine<T>(StreamReader streamReader, TryParseHandler<T> handler, params char separators) : IEnumerable<T>
-
-    +ReadAllLines<T>(string prompt) : string
-    +ReadAllLines<T>(StreamReader streamReader, TryParseHandler<T> handler, out bool isOkay) : IEnumerable<T>
-    +ReadAllLines<T>(StreamReader streamReader, TryParseHandler<T> handler, out bool isOkay, params char separators) : IEnumerable<IEnumerable<T>>
+    +ReadLine<T>(streamReader: StreamReader, handler: TryParseHandler<T>) : T
+    +ReadLine<T>(streamReader: StreamReader, handler: TryParseHandler<T>, params char separators) : IEnumerable<T>
+    +ReadAllLines<T>(prompt: string) : string
+    +ReadAllLines<T>(streamReader: StreamReader, handler: TryParseHandler<T>) : bool×IEnumerable<T>
+    +ReadAllLines<T>(streamReader: StreamReader, handler: TryParseHandler<T>, params char separators) : bool×IEnumerable<IEnumerable<T>>
 }
+
+class Reader implements IReader{
+    - _logger: ILogger
+    - _writer: IWriter
+    + <<constructor>> Reader(logger: ILogger, writer: IWriter)
+    + ReadLine<T>(streamReader: StreamReader, handler: TryParseHandler<T>, params char[] separators) : bool×IEnumerable<T> 
+    + ReadLine<T>(streamReader: StreamReader, handler: TryParseHandler<T>) : bool×T
+    + ReadLine<T>(handler: TryParseHandler<T>, prompt: string) : T
+    + ReadLine<T>(handler: TryParseHandler<T>, prompt: string, params char[] separators) : IEnumerable<T>
+    + ReadLine<T>(handler: TryParseHandler<T>, prompt: string, errorMsg: string) : T
+    + ReadLine<T>(handler: TryParseHandler<T>, prompt: string, errorMsg: string, params char[] separators) : IEnumerable<T>
+    + ReadLine<T>(handler: TryParseHandler<T>) : T 
+    + ReadLine<T>(handler: TryParseHandler<T>, params char[] separators) : IEnumerable<T> 
+    + ReadLine<T>(streamReader: StreamReader, handler: TryParseHandler<T>) : T
+    + ReadLine<T>(streamReader: StreamReader, handler: TryParseHandler<T>, params char[] separators) : IEnumerable<T>
+    + ReadAllLines<T>(prompt: string) : string
+    + ReadAllLines<T>(streamReader: StreamReader, handler: TryParseHandler<T>) : bool×IEnumerable<T>
+    + ReadAllLines<T>(streamReader: StreamReader, handler: TryParseHandler<T>, params char[] separators) : bool×IEnumerable<IEnumerable<T>>
+    {static} + ReadLine(streamReader: StreamReader) : string
+    {static} - LastChars(sb: StringBuilder, n: int): string
+}
+
+interface IWriter{
+    + PrintSystemDetails(githubUsername: string, creatorName: string, creatorId: string) : void
+    + Write(severity: MessageSeverity, msg: string) : void
+    + Write(colorEscape: string, msg: string) : void
+    + Write(msg: string) : void
+    + WriteLine(severity: MessageSeverity, msg: string) : void
+    + WriteLine(colorEscape: string, msg: string) : void
+    + WriteLine(msg: string) : void
+    + RestoreTerminalState() : void
+}
+
+class Writer implements IWriter{
+    -_logger: ILogger
+    + <<constructor>> Writer(logger: ILogger)
+    + PrintSystemDetails(githubUsername: string, creatorName: string, creatorId: string) : void
+    + Write(severity: MessageSeverity, msg: string) : void
+    + Write(colorEscape: string, msg: string) : void
+    + Write(msg: string) : void
+    + WriteLine(severity: MessageSeverity, msg: string) : void
+    + WriteLine(colorEscape: string, msg: string) : void
+    + WriteLine(msg: string) : void
+    + RestoreTerminalState() : void
+    - ConstructMsg(severity: MessageSeverity): string
+    - Colorize(colorEscape: string, msg: string): string
+    - ColorizeLine(colorEscape: string, msg: string): string
+}
+
+interface IIOFactory{
+
+}
+
+interface IDisposable {
+    + void Dispose()
+}
+
+interface ILogger extends IDisposable{
+    + LogWrite(message: string): string
+    + LogWriteLine(message: string): string
+    + GetLoggedContent(): string
+}
+
+class Logger implements ILogger{
+    - _isDisposed: bool
+    - _id: Guid
+    - _logPath: string
+    + <<constructor>> Logger(id: Guid)
+    \~Logger()
+    + Dispose(): void
+    # {virtual} Dispose(): void
+    + LogWrite(message: string): string
+    + LogWriteLine(message: string): string
+    + GetLoggedContent(): string
+    + CreateFileStreamAndWriter(streamWriter: StreamWriter): void
+}
+
+note right of Logger::CreateFileStreamAndWriter
+    streamWriter is an out reference parameter
+end note
+
+interface ILoggerFactory{
+    + CreateLogger(id: Guid): ILogger
+}
+
+interface INavigator{
+
+}
+
+
 
 @enduml
