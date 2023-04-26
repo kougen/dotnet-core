@@ -1,33 +1,34 @@
 @startuml IO
 
+note "isOkay is a reference parameter" as BoolRefNote
+note "result is a reference parameter" as TRefNote
+
 interface IReader{
-    +TryParseHandler<T>(string value, out T result) <<delegate bool>>
-
-    +ReadLine<T>(streamReader: StreamReader, handler: TryParseHandler<T>, params char[] separators) :bool×IEnumerable<T> 
-    +ReadLine<T>(streamReader: StreamReader, handler: TryParseHandler<T>) : bool×T
-
-    .. Without Custom StreamReader ..
-    +ReadLine<T>(handler: TryParseHandler<T>, prompt: string) : T
-    +ReadLine<T>(handler: TryParseHandler<T>, prompt: string, params char[] separators) : IEnumerable<T>
-    +ReadLine<T>(handler: TryParseHandler<T>, prompt: string, errorMsg: string) : T
-    +ReadLine<T>(handler: TryParseHandler<T>, prompt: string, errorMsg: string, params char[] separators) : IEnumerable<T>
-    +ReadLine<T>(handler: TryParseHandler<T>) : T 
-    +ReadLine<T>(handler: TryParseHandler<T>, params char[] separators) : IEnumerable<T> 
-
-    .. With Custom StreamReader ..
-    +ReadLine<T>(streamReader: StreamReader, handler: TryParseHandler<T>) : T
-    +ReadLine<T>(streamReader: StreamReader, handler: TryParseHandler<T>, params char separators) : IEnumerable<T>
-    +ReadAllLines<T>(prompt: string) : string
-    +ReadAllLines<T>(streamReader: StreamReader, handler: TryParseHandler<T>) : bool×IEnumerable<T>
-    +ReadAllLines<T>(streamReader: StreamReader, handler: TryParseHandler<T>, params char separators) : bool×IEnumerable<IEnumerable<T>>
+    +TryParseHandler<T>(string value, T result) <<delegate bool>>
+    + ReadLine<T>(streamReader: StreamReader, handler: TryParseHandler<T>, bool isOkay, params char&#91;&#93; separators) : IEnumerable<T> 
+    + ReadLine<T>(streamReader: StreamReader, handler: TryParseHandler<T>, bool isOkay) : T
+    + ReadLine<T>(handler: TryParseHandler<T>, prompt: string) : T
+    + ReadLine<T>(handler: TryParseHandler<T>, prompt: string, params char[] separators) : IEnumerable<T>
+    + ReadLine<T>(handler: TryParseHandler<T>, prompt: string, errorMsg: string) : T
+    + ReadLine<T>(handler: TryParseHandler<T>, prompt: string, errorMsg: string, params char[] separators) : IEnumerable<T>
+    + ReadLine<T>(handler: TryParseHandler<T>) : T 
+    + ReadLine<T>(handler: TryParseHandler<T>, params char[] separators) : IEnumerable<T> 
+    + ReadLine<T>(streamReader: StreamReader, handler: TryParseHandler<T>) : T
+    + ReadLine<T>(streamReader: StreamReader, handler: TryParseHandler<T>, params char separators) : IEnumerable<T>
+    + ReadAllLines<T>(prompt: string) : string
+    + ReadAllLines<T>(streamReader: StreamReader, handler: TryParseHandler<T>) : IEnumerable<T>
+    + ReadAllLines<T>(streamReader: StreamReader, handler: TryParseHandler<T>, params char separators) : IEnumerable<IEnumerable<T>>
 }
+TRefNote <- "IReader::TryParseHandler<T>(string value, T result)"
 
+BoolRefNote -> "IReader::ReadLine<T>(streamReader: StreamReader, handler: TryParseHandler<T>, bool isOkay, params char&#91;&#93; separators)"
+BoolRefNote -> "IReader::ReadLine<T>(streamReader: StreamReader, handler: TryParseHandler<T>, bool isOkay)"
 class Reader implements IReader{
     - _logger: ILogger
     - _writer: IWriter
     + <<constructor>> Reader(logger: ILogger, writer: IWriter)
-    + ReadLine<T>(streamReader: StreamReader, handler: TryParseHandler<T>, params char[] separators) : bool×IEnumerable<T> 
-    + ReadLine<T>(streamReader: StreamReader, handler: TryParseHandler<T>) : bool×T
+    + ReadLine<T>(streamReader: StreamReader, handler: TryParseHandler<T>, bool isOkay, params char[] separators) : IEnumerable<T> 
+    + ReadLine<T>(streamReader: StreamReader, handler: TryParseHandler<T>, bool isOkay) : T
     + ReadLine<T>(handler: TryParseHandler<T>, prompt: string) : T
     + ReadLine<T>(handler: TryParseHandler<T>, prompt: string, params char[] separators) : IEnumerable<T>
     + ReadLine<T>(handler: TryParseHandler<T>, prompt: string, errorMsg: string) : T
@@ -37,8 +38,8 @@ class Reader implements IReader{
     + ReadLine<T>(streamReader: StreamReader, handler: TryParseHandler<T>) : T
     + ReadLine<T>(streamReader: StreamReader, handler: TryParseHandler<T>, params char[] separators) : IEnumerable<T>
     + ReadAllLines<T>(prompt: string) : string
-    + ReadAllLines<T>(streamReader: StreamReader, handler: TryParseHandler<T>) : bool×IEnumerable<T>
-    + ReadAllLines<T>(streamReader: StreamReader, handler: TryParseHandler<T>, params char[] separators) : bool×IEnumerable<IEnumerable<T>>
+    + ReadAllLines<T>(streamReader: StreamReader, handler: TryParseHandler<T>) : IEnumerable<T>
+    + ReadAllLines<T>(streamReader: StreamReader, handler: TryParseHandler<T>, params char[] separators) : IEnumerable<IEnumerable<T>>
     {static} + ReadLine(streamReader: StreamReader) : string
     {static} - LastChars(sb: StringBuilder, n: int): string
 }
@@ -99,7 +100,7 @@ class Logger implements ILogger{
 }
 
 note right of Logger::CreateFileStreamAndWriter
-    streamWriter is an out reference parameter
+    streamWriter is a reference parameter
 end note
 
 interface ILoggerFactory{
