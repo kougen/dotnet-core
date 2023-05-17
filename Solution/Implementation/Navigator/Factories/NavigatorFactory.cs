@@ -7,14 +7,14 @@ namespace Implementation.Navigator.Factories
 {
     public class NavigatorFactory : INavigatorFactory
     {
-        public INavigator CreateNavigator(IWriter writer)
+        public INavigator<T> CreateNavigator<T>(IWriter writer)
         {
-            return new Navigator(writer, new List<INavigatorElement>());
+            return new Navigator<T>(writer, new List<INavigatorElement<T>>());
         }
 
-        public INavigator CreateNavigator(IWriter writer, IEnumerable<INavigatorElement> navigatorElements)
+        public INavigator<T> CreateNavigator<T>(IWriter writer, IEnumerable<INavigatorElement<T>> navigatorElements)
         {
-            return new Navigator(writer, new List<INavigatorElement>());
+            return new Navigator<T>(writer, navigatorElements);
         }
     }
 }
