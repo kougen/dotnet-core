@@ -15,23 +15,26 @@ namespace Implementation.IO
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public void PrintSystemDetails(string githubUsername, string creatorName, string creatorId)
+        public void PrintSystemDetails(string githubUsername, string creatorName, string creatorId, string projectName, string desc)
         {
             var startedTime = DateTime.Now.ToString("h:mm:ss");
             var host = Environment.MachineName;
             var user = Environment.UserName;
             var platform = Environment.OSVersion.Platform;
             var message =
-                $" -------- HOST PC -------- \n" +
-                $"[START AT]: {startedTime}\n" +
-                $"\t[    HOST]: {host}\n" +
-                $"[    USER]: {user}\n" +
-                $"[PLATFORM]: {platform}\n\n\t" +
-                $" -------- CREATOR -------- \n" +
-                $"[ MADE BY]: {creatorId} ({creatorName})\n" +
-                $"[  GITHUB]: https://github.com/{githubUsername}/\n\n" +
-                $" ------ EXECUTION ------ \n\n";
-
+                $" -------- Host PC -------- \n" +
+                $"[   START AT]: {startedTime}\n" +
+                $"\t[     HOST]: {host}\n" +
+                $"[       USER]: {user}\n" +
+                $"[   PLATFORM]: {platform}\n\n\t" +
+                $" -------- Creator -------- \n" +
+                $"[    MADE BY]: {creatorId} ({creatorName})\n" +
+                $"[     GITHUB]: https://github.com/{githubUsername}/\n\n" +
+                $" -------- Details -------- \n" +
+                $"[    PROJECT]: {projectName}\n" +
+                $"[DESCRIPTION]: {desc}\n\n" +
+                $" ------- Execution ------- \n";
+            
             Write(Colorize(Constants.EscapeColors.YELLOW, message));
         }
 
@@ -59,7 +62,7 @@ namespace Implementation.IO
         
         public void WriteLine(string colorEscape, string msg)
         {
-            WriteLine(Colorize(Constants.EscapeColors.CYAN, msg));
+            WriteLine(Colorize(colorEscape, msg));
         }
 
         public void WriteLine(string msg)

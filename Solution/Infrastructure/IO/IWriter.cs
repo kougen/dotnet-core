@@ -8,7 +8,9 @@
         /// <param name="githubUsername">The github username of the creator.</param>
         /// <param name="creatorName">The full name of the creator.</param>
         /// <param name="creatorId">The ID or neptun code of the creator.</param>
-        void PrintSystemDetails(string githubUsername, string creatorName, string creatorId);
+        /// <param name="projectName">The name of the project that being run.</param>
+        /// <param name="desc">The long descriptions of the project.</param>
+        void PrintSystemDetails(string githubUsername, string creatorName, string creatorId, string projectName, string desc);
 
         /// <summary>
         /// Writes a single line with a certain severity (color), and time, while logging the console output, for later restore.

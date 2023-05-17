@@ -25,6 +25,11 @@ namespace ManualTests
 
             // var r = _reader.ReadLine<int>(int.TryParse);
             _writer.WriteLine("TestMessage");
+            _writer.PrintSystemDetails("joshika39", 
+                "Joshua Hegedus", 
+                "YQMHWO",
+                "Library",
+                "Some long description. Alma korte bela.");
             
             Console.ReadLine();
 

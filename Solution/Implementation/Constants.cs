@@ -1,8 +1,8 @@
 ﻿namespace Implementation
 {
-    internal class Constants
+    public static class Constants
     {
-        internal class EscapeColors
+        public static class EscapeColors
         {
             public const string RED = "\u001b[31;1m";
             public const string GREEN = "\u001b[32;1m";
