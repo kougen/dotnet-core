@@ -26,8 +26,11 @@ namespace Implementation.IO
             Console.SetIn(streamReader);
             isOkay = false;
 
-            var rawInput = ReadLine(streamReader);
-            _logger.LogWrite($"{rawInput}\n");
+            var rawInput = ReadLine(streamReader, out var isConsole);
+            if (isConsole)
+            {
+                _logger.LogWrite($"{rawInput}\n");
+            }
             var lines = rawInput.Split(separators, StringSplitOptions.RemoveEmptyEntries).ToList();
             lines.RemoveAll(c => c is "\r\n" or "\n" or "\r" or "\n\r");
 
@@ -49,8 +52,11 @@ namespace Implementation.IO
             Console.SetIn(streamReader);
             isOkay = false;
 
-            var rawInput = ReadLine(streamReader);
-            _logger.LogWrite($"{rawInput}\n");
+            var rawInput = ReadLine(streamReader, out var isConsole);
+            if (isConsole)
+            {
+                _logger.LogWrite($"{rawInput}\n");
+            }
             isOkay = handler(rawInput, out var result);
             
             return isOkay ? result : default;
@@ -72,6 +78,11 @@ namespace Implementation.IO
             _writer.Write(Constants.EscapeColors.CYAN, $"[  INPUT: {time}] {prompt}");
             var ans = ReadLine(reader, handler, out _, separators);
             return ans;
+        }
+
+        public string ReadLine(string prompt, string errorMsg)
+        {
+            return ReadLine<string>(Dummy, prompt, errorMsg);
         }
 
         public T ReadLine<T>(IReader.TryParseHandler<T> handler, string prompt, string errorMsg)
@@ -143,7 +154,7 @@ namespace Implementation.IO
             _writer.Write(Constants.EscapeColors.CYAN, $"[  INPUT: {time}] {prompt}");
 
 
-            return ReadLine(streamReader);
+            return ReadLine(streamReader, out _);
         }
 
         public IEnumerable<T> ReadAllLines<T>(StreamReader streamReader, IReader.TryParseHandler<T> handler)
@@ -169,12 +180,12 @@ namespace Implementation.IO
             return items;
         }
 
-        public static string ReadLine(StreamReader streamReader)
+        public static string ReadLine(StreamReader streamReader, out bool fromConsole)
         {
-            var fromConsole = !(streamReader.BaseStream.GetType() == typeof(FileStream));
+            fromConsole = !(streamReader.BaseStream.GetType() == typeof(FileStream));
             Console.SetIn(streamReader);
             var sb = new StringBuilder();
-            while (!streamReader.EndOfStream /* || fromConsole*/)
+            while (!streamReader.EndOfStream)
             {
                 var readInt = streamReader.Read();
                 var readChar = (char)readInt;
@@ -182,7 +193,7 @@ namespace Implementation.IO
                 var test1 = LastChars(sb, 2);
 
 
-                if (!fromConsole && test1 is "\r\n" or "\n\r")
+                if (test1 is "\r\n" or "\n\r")
                 {
                     return sb.ToString();
                 }
@@ -202,6 +213,12 @@ namespace Implementation.IO
                 chars[i] = sb[i + sb.Length - n];
 
             return new string(chars);
+        }
+        
+        private bool Dummy(string line, out string res)
+        {
+            res = line;
+            return true;
         }
     }
 }

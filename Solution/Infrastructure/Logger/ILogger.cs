@@ -14,5 +14,7 @@ namespace Infrastructure.Logger
         
         string GetLoggedContent();
         Task<string> GetLoggedContentAsync();
+
+        Task ClearLogs();
     }
 }

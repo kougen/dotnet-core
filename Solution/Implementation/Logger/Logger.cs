@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
+using System.Reflection;
 using System.Threading.Tasks;
 using Implementation.Commands;
 using Implementation.Logger.Commands;
@@ -14,7 +13,8 @@ namespace Implementation.Logger
     {
         private bool _isDisposed;
         private readonly Guid _id;
-        private readonly string _logPath;
+        private string _logDir;
+        private string _logPath;
 
         public Logger(Guid id)
         {
@@ -24,8 +24,10 @@ namespace Implementation.Logger
             }
 
             _id = id;
-            _logPath = $"{id.ToString().Replace("-", "")}.txt";
+            _logDir = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location);
+            _logPath = Path.Join(_logDir, GetIdFileName());
             _isDisposed = false;
+            InitFile();
         }
         
         public Logger(Guid id, string logPath)
@@ -35,9 +37,16 @@ namespace Implementation.Logger
                 throw new ArgumentNullException(nameof(id));
             }
 
+            if (string.IsNullOrWhiteSpace(logPath))
+            {
+                throw new ArgumentNullException(nameof(logPath));
+            }
+
             _id = id;
-            _logPath = logPath ?? throw new ArgumentNullException(nameof(logPath));
+            _logDir = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location);
+            _logPath = Path.Join(_logDir, logPath);
             _isDisposed = false;
+            InitFile();
         }
 
         ~Logger()
@@ -97,6 +106,34 @@ namespace Implementation.Logger
         {
             ICommandInvoker<string> commandInvoker = new CommandInvoker<string>(new GetLogCommand(_logPath));
             return await commandInvoker.ExecuteCommand();
+        }
+
+        public async Task ClearLogs()
+        {
+            ICommandInvoker<bool> commandInvoker = new CommandInvoker<bool>(new ClearLogCommand(_logPath));
+            await commandInvoker.ExecuteCommand();
+        }
+
+        private void InitFile()
+        {
+            if (!File.Exists(_logPath))
+            {
+                try
+                {
+                    File.Create(_logPath).Close();
+                }
+                catch (Exception e)
+                {
+                    _logDir = Path.GetTempPath();
+                    _logPath = Path.Join(_logDir, GetIdFileName());
+                    File.Create(_logPath).Close();
+                }
+            }
+        }
+
+        private string GetIdFileName()
+        {
+            return $"{_id.ToString().Replace("-", "")}.txt";
         }
     }
 }

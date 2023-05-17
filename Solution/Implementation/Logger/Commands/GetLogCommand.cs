@@ -21,19 +21,14 @@ namespace Implementation.Logger.Commands
         {
             CanExecute = false;
 
-            
             if (!File.Exists(_filePath))
             {
-                return await Task.FromResult("");
+                throw new FileNotFoundException("Log file does not exists!");
             }
 
-            try
+            using (var streamReader = new StreamReader(_filePath))
             {
-                return await File.ReadAllTextAsync(_filePath);
-            }
-            catch (IOException e)
-            {
-                return await Task.FromResult(e.Message);
+                return await streamReader.ReadToEndAsync();
             }
         }
     }

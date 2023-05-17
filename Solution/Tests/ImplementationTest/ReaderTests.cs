@@ -5,6 +5,7 @@ using System.Linq;
 using Implementation.IO;
 using Implementation.IO.Factories;
 using Implementation.Logger.Factories;
+using Infrastructure.Logger;
 using Xunit;
 
 namespace ImplementationTest
@@ -19,12 +20,20 @@ namespace ImplementationTest
         public void RT_0001_Given_FileWithValidData_When_ReadLineWithSingleValue_Then_ReturnsCorrectValue(string path,
             int expected)
         {
-            var reader = InitializeReader();
-            using var stream = new StreamReader(path);
+            var reader = InitializeReader(out var logger);
 
-            var result = reader.ReadLine<int>(stream, int.TryParse);
+            try
+            {
+                using var stream = new StreamReader(path);
 
-            Assert.Equal(expected, result);
+                var result = reader.ReadLine<int>(stream, int.TryParse);
+
+                Assert.Equal(expected, result);
+            }
+            finally
+            {
+                logger.Dispose();
+            }
         }
 
         [Theory]
@@ -32,24 +41,40 @@ namespace ImplementationTest
         public void RT_0011_Given_FileWithValidData_When_ReadLineWithMultipleValues_Then_ReturnsCorrectValue(
             string path, IEnumerable<int> elements)
         {
-            var reader = InitializeReader();
-            using var stream = new StreamReader(path);
+            var reader = InitializeReader(out var logger);
 
-            var result = reader.ReadLine<int>(stream, int.TryParse, ' ');
+            try
+            {
+                using var stream = new StreamReader(path);
 
-            Assert.Equal(elements, result);
+                var result = reader.ReadLine<int>(stream, int.TryParse, ' ');
+
+                Assert.Equal(elements, result);
+            }
+            finally
+            {
+                logger.Dispose();
+            }
         }
 
         [Fact]
         public void RT_0021_Given_FileWithValidData_When_ReadLine_Then_ReturnsTheString()
         {
-            var reader = InitializeReader();
-            using var stream = new StreamReader(@"Resources\RT\readlineTest.txt");
-            const string contents = "test String";
+            var reader = InitializeReader(out var logger);
 
-            var result = Reader.ReadLine(stream);
+            try
+            {
+                using var stream = new StreamReader(@"Resources\RT\readlineTest.txt");
+                const string contents = "test String";
 
-            Assert.Equal(contents, result);
+                var result = Reader.ReadLine(stream, out _);
+
+                Assert.Equal(contents, result);
+            }
+            finally
+            {
+                logger.Dispose();
+            }
         }
 
         [Theory]
@@ -58,11 +83,19 @@ namespace ImplementationTest
             RT_0031_Given_FileWithValidDataWithDifferentSeparator_When_ReadLineIsCalled_Then_ReturnsCorrectValue(
                 string path, IEnumerable<int> elements)
         {
-            var reader = InitializeReader();
-            using var stream = new StreamReader(path);
-            var result = reader.ReadLine<int>(stream, int.TryParse, ' ', '\t');
+            var reader = InitializeReader(out var logger);
 
-            Assert.Equal(elements, result);
+            try
+            {
+                using var stream = new StreamReader(path);
+                var result = reader.ReadLine<int>(stream, int.TryParse, ' ', '\t');
+
+                Assert.Equal(elements, result);
+            }
+            finally
+            {
+                logger.Dispose();
+            }
         }
 
         [Theory]
@@ -70,11 +103,19 @@ namespace ImplementationTest
         public void RT_0041_Given_FileWithValidData_When_ReadAllLinesForOneValue_Then_ReturnsCorrectValue(string path,
             IEnumerable<int> elements)
         {
-            var reader = InitializeReader();
-            using var stream = new StreamReader(path);
-            var result = reader.ReadAllLines<int>(stream, int.TryParse);
+            var reader = InitializeReader(out var logger);
 
-            Assert.Equal(elements, result);
+            try
+            {
+                using var stream = new StreamReader(path);
+                var result = reader.ReadAllLines<int>(stream, int.TryParse);
+
+                Assert.Equal(elements, result);
+            }
+            finally
+            {
+                logger.Dispose();
+            }
         }
 
         [Theory]
@@ -82,11 +123,19 @@ namespace ImplementationTest
         public void RT_0051_Given_FileWithValidData_When_ReadAllLinesForMultipleValues_Then_ReturnsCorrectValue(
             string path, IEnumerable<IEnumerable<int>> elements)
         {
-            var reader = InitializeReader();
-            using var stream = new StreamReader(path);
-            var result = reader.ReadAllLines<int>(stream, int.TryParse, ' ', '\t');
+            var reader = InitializeReader(out var logger);
 
-            Assert.Equal(elements, result);
+            try
+            {
+                using var stream = new StreamReader(path);
+                var result = reader.ReadAllLines<int>(stream, int.TryParse, ' ', '\t');
+
+                Assert.Equal(elements, result);
+            }
+            finally
+            {
+                logger.Dispose();
+            }
         }
 
         [Theory]
@@ -94,18 +143,26 @@ namespace ImplementationTest
         public void RT_0061_Given_FileWithValidData_When_ReadAllLinesWithCustomConverter_Then_ReturnsCorrectValue(
             string path, IEnumerable<TestClasses.TestStudent> students)
         {
-            var reader = InitializeReader();
-            using var stream = new StreamReader(path);
-            var result = reader.ReadAllLines<TestClasses.TestStudent>(
-                stream, TestClasses.TestStudent.TryParse);
-            
-            var test = false;
-            foreach (var zipElem in students.Zip(result, (e, a) => new { Expected = e, Actual = a }))
+            var reader = InitializeReader(out var logger);
+
+            try
             {
-                test = zipElem.Expected.Equals(zipElem.Actual);
+                using var stream = new StreamReader(path);
+                var result = reader.ReadAllLines<TestClasses.TestStudent>(
+                    stream, TestClasses.TestStudent.TryParse);
+
+                var test = false;
+                foreach (var zipElem in students.Zip(result, (e, a) => new { Expected = e, Actual = a }))
+                {
+                    test = zipElem.Expected.Equals(zipElem.Actual);
+                }
+
+                Assert.True(test);
             }
-            
-            Assert.True(test);
+            finally
+            {
+                logger.Dispose();
+            }
         }
 
         public static IEnumerable<object[]> RT_0011_MemberData()
@@ -178,10 +235,10 @@ namespace ImplementationTest
             };
         }
 
-        private static Reader InitializeReader()
+        private static Reader InitializeReader(out ILogger logger)
         {
             var id = Guid.NewGuid();
-            using var logger = new LoggerFactory().CreateLogger(id);
+            logger = new LoggerFactory().CreateLogger(id);
             var ioFactory = new IOFactory();
             return new Reader(logger, ioFactory.CreateWriter(logger));
         }

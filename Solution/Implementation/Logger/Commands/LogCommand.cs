@@ -23,27 +23,18 @@ namespace Implementation.Logger.Commands
         public async Task<string> Execute()
         {
             CanExecute = false;
+            
+            if (!File.Exists(_filePath))
+            {
+                throw new FileNotFoundException("Log file does not exists!");
+            }
 
-            StreamWriter streamWriter;
-            
-            if (File.Exists(_filePath))
-            {
-                streamWriter = new StreamWriter(_filePath, true, Encoding.ASCII);
-            }
-            else
-            {
-                streamWriter = new StreamWriter(File.Open(_filePath, FileMode.Create), Encoding.ASCII);
-            }
-            
-            try
+            using (var streamWriter = new StreamWriter(_filePath, true, Encoding.ASCII))
             {
                 await streamWriter.WriteAsync(_content);
             }
-            finally
-            {
-                streamWriter.Close();
-                CanExecute = true;
-            }
+
+            CanExecute = true;
 
             return _content;
         }

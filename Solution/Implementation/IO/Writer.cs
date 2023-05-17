@@ -5,7 +5,7 @@ using Infrastructure.Logger;
 
 namespace Implementation.IO
 {
-    public class Writer : IWriter
+    internal class Writer : IWriter
     {
         private readonly ILogger _logger;
 
@@ -70,6 +70,12 @@ namespace Implementation.IO
             Console.Write(_logger.LogWriteLine(msg));
         }
 
+        public void HelperMessage(MessageSeverity severity, string msg)
+        {
+            var prefix = ConstructMsg(severity);
+            Console.WriteLine($"{prefix}{msg}");
+        }
+
         private string ConstructMsg(MessageSeverity severity)
         {
             var time = DateTime.Now.ToString("HH:mm:ss");
@@ -92,6 +98,12 @@ namespace Implementation.IO
         {
             var content = _logger.GetLoggedContent();
             Console.Write(content);
+        }
+
+        public void CompleteClear()
+        {
+            Console.Clear();
+            _logger.ClearLogs();
         }
 
         #region Private Methods

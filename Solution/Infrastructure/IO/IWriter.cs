@@ -53,8 +53,20 @@
         void WriteLine(string msg);
         
         /// <summary>
+        /// Writes a single line with a <b>new line at the end</b> without saving the string to the log
+        /// </summary>
+        /// <param name="severity">Tells what is the severity of the message: info, warning, error, success.</param>
+        /// <param name="msg">The printed message.</param>
+        void HelperMessage(MessageSeverity severity, string msg);
+        
+        /// <summary>
         /// Restores the logged terminal from the file.
         /// </summary>
         void RestoreTerminalState();
+
+        /// <summary>
+        /// Clears the terminal window as well as the log file's content.
+        /// </summary>
+        void CompleteClear();
     }
 }
