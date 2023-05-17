@@ -3,11 +3,10 @@ using System.Collections.Generic;
 
 namespace Infrastructure.Navigator
 {
-    public interface INavigator
+    public interface INavigator<T>
     {
         int SelectedIndex { get; }
-        int Show();
-
-        void UpdateItems(IEnumerable<INavigatorElement> newList);
+        T Show();
+        void UpdateItems(IEnumerable<INavigatorElement<T>> newList);
     }
 }

@@ -1,11 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
+using Implementation.Commands;
+using Implementation.Logger.Commands;
+using Infrastructure.Commands;
 using Infrastructure.Logger;
 
 namespace Implementation.Logger
 {
-    internal class Logger : ILogger
+    internal sealed class Logger : ILogger
     {
         private bool _isDisposed;
         private readonly Guid _id;
@@ -22,19 +27,31 @@ namespace Implementation.Logger
             _logPath = $"{id.ToString().Replace("-", "")}.txt";
             _isDisposed = false;
         }
+        
+        public Logger(Guid id, string logPath)
+        {
+            if (id.Equals(Guid.Empty))
+            {
+                throw new ArgumentNullException(nameof(id));
+            }
+
+            _id = id;
+            _logPath = logPath ?? throw new ArgumentNullException(nameof(logPath));
+            _isDisposed = false;
+        }
 
         ~Logger()
         {
             Dispose(false);
         }
-        
+
         public void Dispose()
         {
             Dispose(true);
-            GC.SuppressFinalize(this); 
+            GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!_isDisposed)
             {
@@ -48,51 +65,38 @@ namespace Implementation.Logger
         }
 
         public string LogWrite(string message)
-            {
-                CreateFileStreamAndWriter(out var streamWriter);
+        {
+            return LogWriteAsync(message).Result;
+        }
 
-                streamWriter.Write(message);
-                streamWriter.Close();
+        public async Task<string> LogWriteAsync(string message)
+        {
+            ICommandInvoker<string> commandInvoker = new CommandInvoker<string>(new LogCommand(_logPath, message));
+            var result = await commandInvoker.ExecuteCommand();
+            return result;
+        }
 
-                return message;
-            }
+        public string LogWriteLine(string message)
+        {
+            return LogWriteLineAsync(message).Result;
+        }
 
-            public string LogWriteLine(string message)
-            {
-                CreateFileStreamAndWriter(out var streamWriter);
+        public async Task<string> LogWriteLineAsync(string message)
+        {
+            message = $"{message}\n";
+            var result = await LogWriteAsync(message);
+            return result;
+        }
 
-                message = $"{message}\n";
+        public string GetLoggedContent()
+        {
+            return GetLoggedContentAsync().Result;
+        }
 
-                streamWriter.Write(message);
-                streamWriter.Close();
-
-                return message;
-            }
-
-            public string GetLoggedContent()
-            {
-                var contentStr = File.ReadAllText(_logPath, Encoding.ASCII);
-
-                contentStr = contentStr.Replace($"{_id}\r\n", "");
-
-                return contentStr;
-            }
-
-            private void CreateFileStreamAndWriter(out StreamWriter streamWriter)
-            {
-                // string line;
-                // using (var reader = new StreamReader(_logPath))
-                // {
-                //     line = reader.ReadLine();
-                // }
-
-                streamWriter =
-                    File.Exists(_logPath)
-                        ? new StreamWriter(_logPath, true, Encoding.ASCII)
-                        : new StreamWriter(File.Open(_logPath, FileMode.Create), Encoding.ASCII);
-                // new StreamWriter(File.Create(_logPath, 4096, FileOptions.DeleteOnClose),  Encoding.ASCII);
-
-                // streamWriter.WriteLine(_id.ToString());
-            }
+        public async Task<string> GetLoggedContentAsync()
+        {
+            ICommandInvoker<string> commandInvoker = new CommandInvoker<string>(new GetLogCommand(_logPath));
+            return await commandInvoker.ExecuteCommand();
         }
     }
+}

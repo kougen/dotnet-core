@@ -7,12 +7,12 @@ using Infrastructure.Navigator;
 
 namespace Implementation.Navigator
 {
-    internal class Navigator : INavigator
+    internal class Navigator<T> : INavigator<T>
     {
         private readonly IWriter _writer;
-        private IEnumerable<INavigatorElement> _items;
+        private IEnumerable<INavigatorElement<T>> _items;
 
-        public Navigator(IWriter writer, IEnumerable<INavigatorElement> items)
+        public Navigator(IWriter writer, IEnumerable<INavigatorElement<T>> items)
         {
             SelectedIndex = 0;
             _writer = writer ?? throw new ArgumentNullException(nameof(writer));
@@ -21,12 +21,12 @@ namespace Implementation.Navigator
 
         public int SelectedIndex { get; private set; }
 
-        public int Show()
+        public T Show()
         {
             if (_items == null || !_items.Any())
             {
                 _writer.WriteLine(MessageSeverity.Error, "Navigator list is empty!");
-                return 0;
+                return default;
             }
             var selectedIndex = 0;
             
@@ -59,10 +59,11 @@ namespace Implementation.Navigator
             _writer.RestoreTerminalState();
             itemList[selectedIndex].Callback();
             SelectedIndex = selectedIndex;
-            return selectedIndex;
+            
+            return itemList[SelectedIndex].Value;
         }
 
-        public void UpdateItems(IEnumerable<INavigatorElement> newList)
+        public void UpdateItems(IEnumerable<INavigatorElement<T>> newList)
         {
             SelectedIndex = 0;
             _items = newList;

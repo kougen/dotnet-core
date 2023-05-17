@@ -2,10 +2,10 @@
 
 namespace Infrastructure.Navigator
 {
-    public interface INavigatorElement
+    public interface INavigatorElement<T>
     {
         string DisplayValue { get; }
-        
+        T Value { get; }
         Action Callback { get; }
     }
 }

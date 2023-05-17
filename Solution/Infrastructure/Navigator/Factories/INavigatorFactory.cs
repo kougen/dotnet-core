@@ -5,7 +5,7 @@ namespace Infrastructure.Navigator.Factories
 {
     public interface INavigatorFactory
     {
-        INavigator CreateNavigator(IWriter writer);
-        INavigator CreateNavigator(IWriter writer, IEnumerable<INavigatorElement> navigatorElements);
+        INavigator<T> CreateNavigator<T>(IWriter writer);
+        INavigator<T> CreateNavigator<T>(IWriter writer, IEnumerable<INavigatorElement<T>> navigatorElements);
     }
 }
