@@ -152,9 +152,9 @@ namespace Implementation.IO
             _writer.WriteLine(MessageSeverity.Info,
                 "To finish entering your long text input enter the 'end of file' character. (Usually Ctrl + Z on windows)");
             _writer.Write(Constants.EscapeColors.CYAN, $"[  INPUT: {time}] {prompt}");
-
-
-            return ReadLine(streamReader, out _);
+            var stringBuilder = new StringBuilder();
+            var test = ReadLine(streamReader, out _);
+            return test;
         }
 
         public IEnumerable<T> ReadAllLines<T>(StreamReader streamReader, IReader.TryParseHandler<T> handler)
@@ -180,7 +180,7 @@ namespace Implementation.IO
             return items;
         }
 
-        public static string ReadLine(StreamReader streamReader, out bool fromConsole)
+        public static string ReadLine(StreamReader streamReader, out bool fromConsole, bool useEndOfFile=true)
         {
             fromConsole = !(streamReader.BaseStream.GetType() == typeof(FileStream));
             Console.SetIn(streamReader);
@@ -193,7 +193,7 @@ namespace Implementation.IO
                 var test1 = LastChars(sb, 2);
 
 
-                if (test1 is "\r\n" or "\n\r")
+                if (!useEndOfFile && test1 is "\r\n" or "\n\r")
                 {
                     return sb.ToString();
                 }

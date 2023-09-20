@@ -28,6 +28,8 @@ namespace ManualTests
                 "YQMHWO",
                 "Name of project",
                 "Some long description.");
+
+            var text = _reader.ReadAllLines("asdasdasd: ");
             var test = _reader.ReadLine<int>(int.TryParse, "Kerek egy szamot");
             var test2 = new List<INavigatorElement<int>>
             {
