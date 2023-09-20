@@ -36,6 +36,11 @@ namespace ImplementationTest
             }
         }
 
+        public static IEnumerable<object[]> RT_0011_MemberData()
+        {
+            yield return new object[] { @"Resources\RT\0002_0.txt", new List<int> { 0, 1, 2, 3, 4 } };
+            yield return new object[] { @"Resources\RT\0002_1.txt", new List<int> { 4, 2, 5, 8 } };
+        }
         [Theory]
         [MemberData(nameof(RT_0011_MemberData))]
         public void RT_0011_Given_FileWithValidData_When_ReadLineWithMultipleValues_Then_ReturnsCorrectValue(
@@ -77,6 +82,11 @@ namespace ImplementationTest
             }
         }
 
+        public static IEnumerable<object[]> RT_0031_MemberData()
+        {
+            yield return new object[] { @"Resources\RT\0031_0.txt", new List<int> { 1, 2, 3 } };
+            yield return new object[] { @"Resources\RT\0031_1.txt", new List<int> { 4, 2, 5, 8 } };
+        }
         [Theory]
         [MemberData(nameof(RT_0031_MemberData))]
         public void
@@ -98,6 +108,11 @@ namespace ImplementationTest
             }
         }
 
+        public static IEnumerable<object[]> RT_0041_MemberData()
+        {
+            yield return new object[] { @"Resources\RT\0041_0.txt", new List<int> { 4, 2, 5, 8 } };
+            yield return new object[] { @"Resources\RT\0041_1.txt", new List<int> { 1, 2, 3 } };
+        }
         [Theory]
         [MemberData(nameof(RT_0041_MemberData))]
         public void RT_0041_Given_FileWithValidData_When_ReadAllLinesForOneValue_Then_ReturnsCorrectValue(string path,
@@ -118,6 +133,16 @@ namespace ImplementationTest
             }
         }
 
+        public static IEnumerable<object[]> RT_0051_MemberData()
+        {
+            yield return new object[]
+                { @"Resources\RT\0051_0.txt", new List<List<int>> { new() { 4, 2, 5, 8 }, new() { 1, 1, 1 } } };
+            yield return new object[]
+            {
+                @"Resources\RT\0051_1.txt",
+                new List<List<int>> { new() { 4, 2, 5, 8 }, new() { 1, 2, 3 }, new() { 7, 8, 9, 4, 5 } }
+            };
+        }
         [Theory]
         [MemberData(nameof(RT_0051_MemberData))]
         public void RT_0051_Given_FileWithValidData_When_ReadAllLinesForMultipleValues_Then_ReturnsCorrectValue(
@@ -136,62 +161,6 @@ namespace ImplementationTest
             {
                 logger.Dispose();
             }
-        }
-
-        [Theory]
-        [MemberData(nameof(RT_0061_MemberData))]
-        public void RT_0061_Given_FileWithValidData_When_ReadAllLinesWithCustomConverter_Then_ReturnsCorrectValue(
-            string path, IEnumerable<TestClasses.TestStudent> students)
-        {
-            var reader = InitializeReader(out var logger);
-
-            try
-            {
-                using var stream = new StreamReader(path);
-                var result = reader.ReadAllLines<TestClasses.TestStudent>(
-                    stream, TestClasses.TestStudent.TryParse);
-
-                var test = false;
-                foreach (var zipElem in students.Zip(result, (e, a) => new { Expected = e, Actual = a }))
-                {
-                    test = zipElem.Expected.Equals(zipElem.Actual);
-                }
-
-                Assert.True(test);
-            }
-            finally
-            {
-                logger.Dispose();
-            }
-        }
-
-        public static IEnumerable<object[]> RT_0011_MemberData()
-        {
-            yield return new object[] { @"Resources\RT\0002_0.txt", new List<int> { 0, 1, 2, 3, 4 } };
-            yield return new object[] { @"Resources\RT\0002_1.txt", new List<int> { 4, 2, 5, 8 } };
-        }
-
-        public static IEnumerable<object[]> RT_0031_MemberData()
-        {
-            yield return new object[] { @"Resources\RT\0031_0.txt", new List<int> { 1, 2, 3 } };
-            yield return new object[] { @"Resources\RT\0031_1.txt", new List<int> { 4, 2, 5, 8 } };
-        }
-
-        public static IEnumerable<object[]> RT_0041_MemberData()
-        {
-            yield return new object[] { @"Resources\RT\0041_0.txt", new List<int> { 4, 2, 5, 8 } };
-            yield return new object[] { @"Resources\RT\0041_1.txt", new List<int> { 1, 2, 3 } };
-        }
-
-        public static IEnumerable<object[]> RT_0051_MemberData()
-        {
-            yield return new object[]
-                { @"Resources\RT\0051_0.txt", new List<List<int>> { new() { 4, 2, 5, 8 }, new() { 1, 1, 1 } } };
-            yield return new object[]
-            {
-                @"Resources\RT\0051_1.txt",
-                new List<List<int>> { new() { 4, 2, 5, 8 }, new() { 1, 2, 3 }, new() { 7, 8, 9, 4, 5 } }
-            };
         }
 
         public static IEnumerable<object[]> RT_0061_MemberData()
@@ -233,6 +202,32 @@ namespace ImplementationTest
                     }
                 }
             };
+        }
+        [Theory]
+        [MemberData(nameof(RT_0061_MemberData))]
+        public void RT_0061_Given_FileWithValidData_When_ReadAllLinesWithCustomConverter_Then_ReturnsCorrectValue(
+            string path, IEnumerable<TestClasses.TestStudent> students)
+        {
+            var reader = InitializeReader(out var logger);
+
+            try
+            {
+                using var stream = new StreamReader(path);
+                var result = reader.ReadAllLines<TestClasses.TestStudent>(
+                    stream, TestClasses.TestStudent.TryParse);
+
+                var test = false;
+                foreach (var zipElem in students.Zip(result, (e, a) => new { Expected = e, Actual = a }))
+                {
+                    test = zipElem.Expected.Equals(zipElem.Actual);
+                }
+
+                Assert.True(test);
+            }
+            finally
+            {
+                logger.Dispose();
+            }
         }
 
         private static Reader InitializeReader(out ILogger logger)
