@@ -38,7 +38,7 @@ jobs:
       run: dotnet test $env:SOLUTION /p:Configuration=$env:BUILD_CONFIG --no-restore --no-build --verbosity normal
   deploy:
     name: 'Deploy'
-    needs: [build, test]
+    needs: [build]
     env:
       BUILD_CONFIG: 'Publish'
       SOLUTION: './Solution/Modules.sln'
