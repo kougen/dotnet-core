@@ -238,7 +238,7 @@ namespace ImplementationTest
             return new Reader(logger, ioFactory.CreateWriter(logger));
         }
 
-
+#pragma warning disable CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
         public class TestClasses
         {
             public class TestSubject
@@ -258,6 +258,7 @@ namespace ImplementationTest
                     Grade = grade;
                 }
 
+
                 public override bool Equals(object obj)
                 {
                     if (obj is TestSubject sub)
@@ -273,7 +274,6 @@ namespace ImplementationTest
                     return Code == other.Code && Credit == other.Credit && Grade.Equals(other.Grade);
                 }
             }
-
             public class TestStudent
             {
                 private List<TestSubject> _subjects;
@@ -351,5 +351,6 @@ namespace ImplementationTest
                 }
             }
         }
+#pragma warning restore CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
     }
 }

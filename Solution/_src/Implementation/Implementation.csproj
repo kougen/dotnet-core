@@ -8,7 +8,7 @@
         <Company>JHost</Company>
         <Description>This is the backend for my base library.</Description>
         <NeutralLanguage>en</NeutralLanguage>
-        <Configurations>Debug;Release;Publish</Configurations>
+        <Configurations>Debug;Release</Configurations>
         <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
         <Platforms>AnyCPU</Platforms>
         <AssemblyName>joshika39.$(MSBuildProjectName)</AssemblyName>
@@ -20,10 +20,6 @@
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
         <OutputPath>..\..\Binaries\Release\</OutputPath>
-    </PropertyGroup>
-
-    <PropertyGroup Condition=" '$(Configuration)' == 'Publish' ">
-        <OutputPath>..\..\Binaries\Publish\</OutputPath>
     </PropertyGroup>
 
     <ItemGroup>
