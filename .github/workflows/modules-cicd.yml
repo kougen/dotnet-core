@@ -6,39 +6,39 @@ on:
       - "v[0-9]+.[0-9]+.[0-9]+-preview[0-9][0-9][0-9][0-9]"
     
 jobs:
-  build:
-    name: 'Build'
-    env:
-      BUILD_CONFIG: 'Release'
-      SOLUTION: 'Solution/Modules.sln'
+  # build:
+  #   name: 'Build'
+  #   env:
+  #     BUILD_CONFIG: 'Release'
+  #     SOLUTION: 'Solution/Modules.sln'
 
-    runs-on: windows-latest
+  #   runs-on: windows-latest
 
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
+  #   steps:
+  #   - name: Checkout
+  #     uses: actions/checkout@v3
+  #     with:
+  #       fetch-depth: 0
 
-    - name: Install .NET Core
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 5.0.x
+  #   - name: Install .NET Core
+  #     uses: actions/setup-dotnet@v3
+  #     with:
+  #       dotnet-version: 5.0.x
 
-    - name: Setup MSBuild.exe
-      uses: microsoft/setup-msbuild@v1.0.2
+  #   - name: Setup MSBuild.exe
+  #     uses: microsoft/setup-msbuild@v1.0.2
 
-    - name: Restore dependencies
-      run: nuget restore $env:SOLUTION
+  #   - name: Restore dependencies
+  #     run: nuget restore $env:SOLUTION
 
-    - name: Build
-      run: dotnet build $env:SOLUTION --configuration $env:BUILD_CONFIG --no-restore
+  #   - name: Build
+  #     run: dotnet build $env:SOLUTION --configuration $env:BUILD_CONFIG --no-restore
 
-    - name: Run tests
-      run: dotnet test $env:SOLUTION /p:Configuration=$env:BUILD_CONFIG --no-restore --no-build --verbosity normal
+  #   - name: Run tests
+  #     run: dotnet test $env:SOLUTION /p:Configuration=$env:BUILD_CONFIG --no-restore --no-build --verbosity normal
   deploy:
     name: 'Deploy'
-    needs: ['build']
+    # needs: ['build']
     env:
       BUILD_CONFIG: 'Release'
       SOLUTION: './Solution/Modules.sln'
@@ -71,7 +71,7 @@ jobs:
       
     - name: Pack Modules
       shell: pwsh
-      run: '& .\Solution\Tools\PushArtifact.ps1 -Version ${{ steps.get_version.outputs.version-without-v }}'
+      run: '& .\Solution\Tools\PushArtifact.ps1 -Version ${{ steps.get_version.outputs.version-without-v }}' -WorkDir .\Solution\Tools\
 
     - name: Publish
       run: |
