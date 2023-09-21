@@ -5,7 +5,7 @@ using Infrastructure.Navigator.Factories;
 
 namespace Implementation.Navigator.Factories
 {
-    public class NavigatorFactory : INavigatorFactory
+    internal class NavigatorFactory : INavigatorFactory
     {
         public INavigator<T> CreateNavigator<T>(IWriter writer)
         {

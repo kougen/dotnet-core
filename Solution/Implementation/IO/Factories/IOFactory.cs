@@ -4,7 +4,7 @@ using Infrastructure.Logger;
 
 namespace Implementation.IO.Factories
 {
-    public class IOFactory : IIOFactory
+    internal class IOFactory : IIOFactory
     {
         public IReader CreateReader(ILogger logger, IWriter writer)
         {

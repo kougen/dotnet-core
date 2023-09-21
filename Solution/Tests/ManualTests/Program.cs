@@ -6,42 +6,45 @@ using Implementation.Navigator;
 using Implementation.Navigator.Factories;
 using Infrastructure;
 using Infrastructure.IO;
+using Infrastructure.Logger;
 using Infrastructure.Navigator;
+using Infrastructure.Navigator.Factories;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ManualTests
 {
     internal static class Program
     {
-        private static IReader _reader;
-        private static IWriter _writer;
         static void Main(string[] args)
         {
-            var id = Guid.NewGuid();
-            using var logger = new LoggerFactory().CreateLogger(id);
-            
-            var ioFactory = new IOFactory();
-            _writer = ioFactory.CreateWriter(logger);
-            _reader = ioFactory.CreateReader(logger, _writer);
-            
-            _writer.PrintSystemDetails("joshika39", 
-                "Joshua Hegedus", 
-                "YQMHWO",
-                "Name of project",
-                "Some long description.");
+            var services = new Core().LoadModules();
 
-            var text = _reader.ReadAllLines("asdasdasd: ");
-            var test = _reader.ReadLine<int>(int.TryParse, "Kerek egy szamot");
-            var test2 = new List<INavigatorElement<int>>
+            using (var scope = services.CreateScope())
             {
-                new NavigatorElement<int>("asd", 123),
-                new NavigatorElement<int>("zxc", 2),
-                new NavigatorElement<int>("qwe", 32),
-                new NavigatorElement<int>("ret", 43)
-            };
-            var nav = new NavigatorFactory().CreateNavigator<int>(_writer);
-            nav.UpdateItems(test2);
-            var res = nav.Show();
-            _writer.WriteLine(MessageSeverity.Success, $"Res: {res}");
+                var writer = scope.ServiceProvider.GetService<IWriter>();
+                var reader = scope.ServiceProvider.GetService<IReader>();
+                var elemFact = scope.ServiceProvider.GetService<INavigatorElementFactory>();
+                var navFact = scope.ServiceProvider.GetService<INavigatorFactory>();
+            
+                writer.PrintSystemDetails("joshika39", 
+                    "Joshua Hegedus", 
+                    "YQMHWO",
+                    "Name of project",
+                    "Some long description.");
+
+                var text = reader.ReadAllLines("asdasdasd: ");
+                var test = reader.ReadLine<int>(int.TryParse, "Kerek egy szamot");
+                var test2 = new List<INavigatorElement<int>>
+                {
+                    elemFact.CreateNavigatorElement("asd", 123),
+                    elemFact.CreateNavigatorElement("zxc", 2),
+                    elemFact.CreateNavigatorElement("qwe", 32),
+                    elemFact.CreateNavigatorElement("ret", 43)
+                };
+                var nav = navFact.CreateNavigator(writer, test2);
+                var res = nav.Show();
+                writer.WriteLine(MessageSeverity.Success, $"Res: {res}");
+            }
         }
     }
 }

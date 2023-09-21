@@ -3,22 +3,25 @@ using System.Collections.Generic;
 using Implementation.Navigator;
 using Implementation.Navigator.Factories;
 using Infrastructure.Navigator;
+using Infrastructure.Navigator.Factories;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ManualTests
 {
-    public class Dump
+    internal class Dump
     {
         private void Dumper()
         {
             Console.ReadLine();
-
+            var provider = new Core().LoadModules();
+            var elemFact = provider.GetService<INavigatorElementFactory>();
             // var test = _reader.ReadAllLines("Adjon meg hosszu szoveget");
             var elements = new List<INavigatorElement<string>>()
             {
-                new NavigatorElement<string>("asd", "asdValue"),
-                new NavigatorElement<string>("dsa", "dsaValue"),
-                new NavigatorElement<string>("qwe", "qweValue"),
-                new NavigatorElement<string>("ewq", "ewqValue")
+                elemFact.CreateNavigatorElement("asd", "asdValue"),
+                elemFact.CreateNavigatorElement("dsa", "dsaValue"),
+                elemFact.CreateNavigatorElement("qwe", "qweValue"),
+                elemFact.CreateNavigatorElement("ewq", "ewqValue")
             };
             // var nav = new NavigatorFactory().CreateNavigator(_writer, elements);
             

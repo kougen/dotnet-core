@@ -9,6 +9,7 @@
         <Description>This is the backend for my base library.</Description>
         <NeutralLanguage>en</NeutralLanguage>
         <Configurations>Debug;Release;Publish</Configurations>
+        <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
         <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
 
@@ -32,5 +33,12 @@
     <ItemGroup>
         <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
     </ItemGroup>
+
+
+    <Target DependsOnTargets="ResolveReferences" Name="CopyProjectReferencesToPackage">
+        <ItemGroup>
+            <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths-&gt;WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))" />
+        </ItemGroup>
+    </Target>
 
 </Project>

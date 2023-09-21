@@ -4,8 +4,13 @@ using Infrastructure.Logger.Factories;
 
 namespace Implementation.Logger.Factories
 {
-    public class LoggerFactory : ILoggerFactory
+    internal class LoggerFactory : ILoggerFactory
     {
+        public ILogger CreateLogger()
+        {
+            return new Logger();
+        }
+        
         public ILogger CreateLogger(Guid id)
         {
             return new Logger(id);

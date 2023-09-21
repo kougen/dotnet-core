@@ -16,6 +16,9 @@ namespace Implementation.Logger
         private string _logDir;
         private string _logPath;
 
+        public Logger() : this(Guid.NewGuid())
+        { }
+        
         public Logger(Guid id)
         {
             if (id.Equals(Guid.Empty))

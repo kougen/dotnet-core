@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Core
+namespace Implementation.Tools
 {
     public static class Tools
     {

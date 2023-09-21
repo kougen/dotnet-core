@@ -3,18 +3,11 @@ using Infrastructure.Navigator;
 
 namespace Implementation.Navigator
 {
-    public class NavigatorElement<T> : INavigatorElement<T>
+    internal class NavigatorElement<T> : INavigatorElement<T>
     {
         public string DisplayValue { get; }
         public T Value { get; }
         public Action Callback { get; }
-        
-        public NavigatorElement(string displayValue, T value)
-        {
-            DisplayValue = displayValue ?? throw new ArgumentNullException(nameof(displayValue));
-            Value = value ?? throw new ArgumentNullException(nameof(value));
-            Callback = () => { };
-        }
         
         public NavigatorElement(string displayValue, T value, Action callback)
         {

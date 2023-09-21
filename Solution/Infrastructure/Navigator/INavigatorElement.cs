@@ -2,7 +2,7 @@
 
 namespace Infrastructure.Navigator
 {
-    public interface INavigatorElement<T>
+    public interface INavigatorElement<out T>
     {
         string DisplayValue { get; }
         T Value { get; }
