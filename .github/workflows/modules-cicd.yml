@@ -58,7 +58,7 @@ jobs:
     - name: Install .NET Core
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 5.0.x
+        dotnet-version: 6.0.x
 
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v1.0.2
@@ -71,7 +71,7 @@ jobs:
       
     - name: Pack Modules
       shell: pwsh
-      run: '& .\Solution\Tools\PushArtifact.ps1 -Version ${{ steps.get_version.outputs.version-without-v }}' -WorkDir .\Solution\Tools\
+      run: '& .\Solution\Tools\PushArtifact.ps1 -Version ${{ steps.get_version.outputs.version-without-v }} -WorkDir .\Solution\Tools\'
 
     - name: Publish
       run: |
