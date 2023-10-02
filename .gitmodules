@@ -1,0 +1,3 @@
+[submodule "dotnet-tools"]
+	path = dotnet-tools
+	url = https://github.com/joshika39/dotnet-tools.git

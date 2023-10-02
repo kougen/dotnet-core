@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>joshika39.Core</id>
+		<version>1.0.0.0-pre0001</version>
+		<description>Improved .net core functionality. </description>
+		<authors>joshika39</authors>
+		<dependencies>
+			<group targetFramework="net6.0">
+				<dependency id="Microsoft.Extensions.DependencyInjection" version="7.0.0" />
+			</group>
+		</dependencies>
+	</metadata>
+
+	<files>
+		<file src="..\..\Binaries\Release\net6.0\joshika39.*.dll" target="lib\net6.0" />
+	</files>
+</package>
