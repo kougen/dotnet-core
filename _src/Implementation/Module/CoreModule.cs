@@ -1,8 +1,10 @@
 ﻿using System;
+using Implementation.Configuration.Factories;
 using Implementation.IO;
 using Implementation.IO.Factories;
 using Implementation.Logger.Factories;
 using Implementation.Navigator.Factories;
+using Infrastructure.Configuration.Factories;
 using Infrastructure.IO;
 using Infrastructure.IO.Factories;
 using Infrastructure.Logger;
@@ -23,6 +25,7 @@ namespace Implementation.Module
             collection.AddTransient<IIOFactory, IOFactory>();
             collection.AddTransient<INavigatorFactory, NavigatorFactory>();
             collection.AddTransient<INavigatorElementFactory, NavigatorElementFactory>();
+            collection.AddTransient<IConfigurationQueryFactory, JsonConfigurationQueryFactory>();
             collection.AddScoped<IWriter, Writer>();
             collection.AddScoped<IReader, Reader>();
         }

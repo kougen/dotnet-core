@@ -1,0 +1,11 @@
+{
+  "server": {
+    "db": {
+      "connection": "test:string"
+    },
+    "admin": {
+      "name": "Bela",
+      "role": "Heathcliff"
+    }
+  }
+}

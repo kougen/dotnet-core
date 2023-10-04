@@ -12,6 +12,7 @@
         <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
         <Platforms>AnyCPU</Platforms>
         <AssemblyName>joshika39.$(MSBuildProjectName)</AssemblyName>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -35,6 +36,12 @@
     <ItemGroup>
       <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
     </ItemGroup>
+
+
+
+
+
+
 
     <Target DependsOnTargets="ResolveReferences" Name="CopyProjectReferencesToPackage">
         <ItemGroup>
