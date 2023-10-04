@@ -17,13 +17,11 @@ namespace ImplementationTest.RepositoryTests
             var fileName = $@".\data\users-{id}.json";
             try
             {
-                await using (var repository = new JsonRepository<User>(fileName))
-                {
-                    await repository.SaveChanges();
-                    Assert.True(File.Exists(fileName));
-                    var text = await File.ReadAllTextAsync(fileName);
-                    Assert.Equal("[]", text);
-                }
+                await using var repository = new JsonRepository<User>(@".\data", $"users-{id}");
+                await repository.DisposeAsync();
+                Assert.True(File.Exists(fileName));
+                var text = await File.ReadAllTextAsync(fileName);
+                Assert.Equal("[]", text);
             }
             finally
             {
