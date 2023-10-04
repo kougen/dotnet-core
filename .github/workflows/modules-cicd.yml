@@ -10,7 +10,7 @@ jobs:
     name: 'Build, Test & Deploy'
     env:
       BUILD_CONFIG: 'Release'
-      SOLUTION: './Solution/Modules.sln'
+      SOLUTION: './Modules.sln'
 
     runs-on: windows-latest
 

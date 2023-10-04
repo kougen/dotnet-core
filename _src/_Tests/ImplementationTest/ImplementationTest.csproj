@@ -91,6 +91,12 @@
       <None Update="Resources\RT\0061_1.txt">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Update="Resources\JRT\0021-users.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
+
+
+
 
 </Project>
