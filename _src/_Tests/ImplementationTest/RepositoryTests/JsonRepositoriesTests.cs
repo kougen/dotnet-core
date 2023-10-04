@@ -17,7 +17,7 @@ namespace ImplementationTest.RepositoryTests
             var fileName = $@".\data\users-{id}.json";
             try
             {
-                await using var repository = new JsonRepository<User>(@".\data", $"users-{id}");
+                await using var repository = new UserRepository(@".\data", $"users-{id}");
                 await repository.DisposeAsync();
                 Assert.True(File.Exists(fileName));
                 var text = await File.ReadAllTextAsync(fileName);
@@ -39,7 +39,7 @@ namespace ImplementationTest.RepositoryTests
             var fileName = $@".\data\users-{id}.json";
             try
             {
-                await using var repository = new JsonRepository<User>(fileName);
+                await using var repository = new UserRepository(fileName);
                 var user = new User { Name = "Peter", Age = 25 };
                 await repository.Create(user).SaveChanges();
                 var jsonString = $"[{{\"Id\":\"{user.Id}\",\"Name\":\"{user.Name}\",\"Age\":{user.Age}}}]";
@@ -61,7 +61,7 @@ namespace ImplementationTest.RepositoryTests
         {
             var id = Guid.NewGuid();
             const string fileName = @".\Resources\JRT\0021-users.json";
-            await using var repository = new JsonRepository<User>(fileName);
+            await using var repository = new UserRepository(fileName);
             var allUsers = await repository.GetAllEntities();
             Assert.True(File.Exists(fileName));
             Assert.Equal(4, allUsers.Count());

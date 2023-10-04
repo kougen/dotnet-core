@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,33 +8,32 @@ using Newtonsoft.Json;
 
 namespace Implementation.Repositories
 {
-    internal class JsonRepository<T> : IJsonRepository<T> where T : IEntity
+    public abstract class AJsonRepository<T> : IJsonRepository<T> where T : IEntity
     {
         private readonly string _dataPath;
         private readonly string _filePath;
-        private readonly Guid _id;
         private readonly IList<T> _updatedEntities;
         private readonly IList<T> _addedEntities;
         private readonly IList<Guid> _removedEntities;
-        private bool _isLocked = false;
+        private bool _isLocked;
 
-        public JsonRepository(string filePath)
+        protected AJsonRepository(string filePath)
         {
             _updatedEntities = new List<T>();
             _addedEntities = new List<T>();
             _removedEntities = new List<Guid>();
 
-            _id = Guid.NewGuid();
+            Guid.NewGuid();
             _filePath = filePath ?? throw new ArgumentNullException(nameof(filePath));
             _dataPath = Path.GetDirectoryName(filePath) ?? @".\";
         }
 
-        public JsonRepository(string directory, string repositoryKey)
+        protected AJsonRepository(string directory, string repositoryKey)
         {
             _updatedEntities = new List<T>();
             _addedEntities = new List<T>();
             _removedEntities = new List<Guid>();
-            _id = Guid.NewGuid();
+            Guid.NewGuid();
             repositoryKey = repositoryKey ?? throw new ArgumentNullException(nameof(repositoryKey));
             _dataPath = directory ?? throw new ArgumentNullException(nameof(directory));
             _filePath = $@"{_dataPath}\{repositoryKey}.json";
