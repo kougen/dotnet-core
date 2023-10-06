@@ -17,49 +17,66 @@ namespace Implementation.Configuration
         }
 
         #region Get
+        
+        #region Async
         public async Task<string?> GetStringAttributeAsync(string path)
         {
-            var result = await GetAttributeAsync(path);
-            return result?.Value<string>();
+            var jsonString = await File.ReadAllTextAsync(_filePath);
+            var token = GetToken(path, jsonString);
+            return token?.Value<string>();
         }
 
         public async Task<int?> GetIntAttributeAsync(string path)
         {
-            var result = await GetAttributeAsync(path);
-            return result?.Value<int>();
+            var jsonString = await File.ReadAllTextAsync(_filePath);
+            return GetToken(path, jsonString)?.Value<int>();
         }
 
         public async Task<bool?> GetBoolAttributeAsync(string path)
         {
-            var result = await GetAttributeAsync(path);
-            return result?.Value<bool>();
+            var jsonString = await File.ReadAllTextAsync(_filePath);
+            return GetToken(path, jsonString)?.Value<bool>();
         }
 
         public async Task<T?> GetObjectAsync<T>(string path)
         {
-            var token = await GetAttributeAsync(path);
+            var jsonString = await File.ReadAllTextAsync(_filePath);
+            var token = GetToken(path, jsonString);
             return token == null ? default : JsonConvert.DeserializeObject<T>(token?.ToString());
-        }
-        
-        public string? GetStringAttribute(string path)
-        {
-            return GetStringAttributeAsync(path).Result;
-        }
-        
-        public int? GetIntAttribute(string path)
-        {
-            return GetIntAttributeAsync(path).Result;
-        }
-        public bool? GetBoolAttribute(string path)
-        {
-            return GetBoolAttributeAsync(path).Result;
-        }
-        public T? GetObject<T>(string path)
-        {
-            return GetObjectAsync<T>(path).Result;
         }
         #endregion
 
+        #region Sync
+        public string? GetStringAttribute(string path)
+        {
+            var jsonString = File.ReadAllText(_filePath);
+            return GetToken(path, jsonString)?.Value<string>();
+        }
+
+        public int? GetIntAttribute(string path)
+        {
+            var jsonString = File.ReadAllText(_filePath);
+            return GetToken(path, jsonString)?.Value<int>();
+        }
+        
+        public bool? GetBoolAttribute(string path)
+        {
+            var jsonString = File.ReadAllText(_filePath);
+            return GetToken(path, jsonString)?.Value<bool>();
+        }
+        
+        public T? GetObject<T>(string path)
+        {
+            var jsonString = File.ReadAllText(_filePath);
+            var token = GetToken(path, jsonString);
+            return token == null ? default : JsonConvert.DeserializeObject<T>(token.ToString());
+        }
+        #endregion
+
+        #endregion
+
+        #region Set
+        #region Async
         public async Task SetAttributeAsync(string path, string value)
         {
             await SetObjectAsync(path, value);
@@ -74,36 +91,44 @@ namespace Implementation.Configuration
         {
             await SetObjectAsync(path, value);
         }
-        
+
         public async Task SetObjectAsync<T>(string path, T value)
         {
             var content = await File.ReadAllTextAsync(_filePath);
             var jsonObject = SetJsonObject(JObject.Parse(content), path, value);
             await File.WriteAllTextAsync(_filePath, jsonObject.ToString(Formatting.Indented));
         }
+        #endregion
+
+        #region Sync
         public void SetAttribute(string path, string value)
         {
             SetObject(path, value);
         }
+
         public void SetAttribute(string path, int value)
         {
             SetObject(path, value);
         }
+
         public void SetAttribute(string path, bool value)
         {
             SetObject(path, value);
         }
-        
+
         public void SetObject<T>(string path, T value)
         {
             var content = File.ReadAllText(_filePath);
             var jsonObject = SetJsonObject(JObject.Parse(content), path, value);
             File.WriteAllText(_filePath, jsonObject.ToString(Formatting.Indented));
         }
+        #endregion
+        #endregion
 
-        private async Task<JToken?> GetAttributeAsync(string path)
+        #region Private members
+        private static JToken? GetToken(string path, string jsonString)
         {
-            JToken? token = JObject.Parse(await File.ReadAllTextAsync(_filePath));
+            JToken? token = JObject.Parse(jsonString);
             foreach (var segment in path.Trim('.').Split('.'))
             {
                 if (token is not JObject jObject)
@@ -116,7 +141,7 @@ namespace Implementation.Configuration
             return token;
         }
 
-        private JObject SetJsonObject<T>(JObject jsonObject, string path, T value)
+        private static JObject SetJsonObject<T>(JObject jsonObject, string path, T value)
         {
             JToken? token = jsonObject;
             var split = path.Trim('.').Split('.');
@@ -132,17 +157,18 @@ namespace Implementation.Configuration
                     jObject[segment] = JToken.FromObject(value);
                     break;
                 }
-                
+
                 token = jObject.TryGetValue(segment, out var nextToken) ? nextToken : null;
-                
+
                 if (token == null)
                 {
                     jObject[segment] = JToken.Parse("{}");
                     token = jObject.TryGetValue(segment, out nextToken) ? nextToken : null;
                 }
             }
-            
+
             return jsonObject;
         }
+        #endregion
     }
 }

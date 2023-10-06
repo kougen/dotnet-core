@@ -12,7 +12,6 @@ namespace Implementation.Repositories.Factories
         public RepositoryFactory(IApplicationSettings applicationSettings)
         {
             _applicationSettings = applicationSettings ?? throw new ArgumentNullException(nameof(applicationSettings));
-
         }
         
         public IRepository<T> CreateJsonRepository<T>(string repositoryName) where T : IEntity
