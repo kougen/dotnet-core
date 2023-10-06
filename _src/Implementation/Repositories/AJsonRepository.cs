@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Infrastructure.Application;
 using Infrastructure.Repositories;
 using Newtonsoft.Json;
 
 namespace Implementation.Repositories
 {
-    public abstract class AJsonRepository<T> : IJsonRepository<T> where T : IEntity
+    public abstract class AJsonRepository<T> : IRepository<T> where T : IEntity
     {
         private readonly string _dataPath;
         private readonly string _filePath;
@@ -17,26 +18,17 @@ namespace Implementation.Repositories
         private readonly IList<Guid> _removedEntities;
         private bool _isLocked;
 
-        protected AJsonRepository(string filePath)
+        protected AJsonRepository(IApplicationSettings applicationSettings, string repositoryKey)
         {
-            _updatedEntities = new List<T>();
-            _addedEntities = new List<T>();
-            _removedEntities = new List<Guid>();
-
-            Guid.NewGuid();
-            _filePath = filePath ?? throw new ArgumentNullException(nameof(filePath));
-            _dataPath = Path.GetDirectoryName(filePath) ?? @".\";
-        }
-
-        protected AJsonRepository(string directory, string repositoryKey)
-        {
-            _updatedEntities = new List<T>();
-            _addedEntities = new List<T>();
-            _removedEntities = new List<Guid>();
-            Guid.NewGuid();
+            applicationSettings = applicationSettings ?? throw new ArgumentNullException(nameof(applicationSettings));
             repositoryKey = repositoryKey ?? throw new ArgumentNullException(nameof(repositoryKey));
-            _dataPath = directory ?? throw new ArgumentNullException(nameof(directory));
-            _filePath = $@"{_dataPath}\{repositoryKey}.json";
+
+            _updatedEntities = new List<T>();
+            _addedEntities = new List<T>();
+            _removedEntities = new List<Guid>();
+            Guid.NewGuid();
+            _dataPath = Path.Join(applicationSettings.ConfigurationFolder, "Repositories");
+            _filePath = Path.Join(_dataPath, $"{repositoryKey}.json");
         }
 
         public async Task<IEnumerable<T>> GetAllEntities()

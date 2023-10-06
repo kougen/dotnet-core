@@ -8,11 +8,8 @@ namespace ManualTests
     {
         public IServiceProvider LoadModules()
         {
-            var core = new CoreModule();
             var collection = new ServiceCollection();
-            
-            core.LoadModules(collection);
-            
+            CoreModule.LoadModules(collection, "ManualTests");
             return collection.BuildServiceProvider();
         }
     }
