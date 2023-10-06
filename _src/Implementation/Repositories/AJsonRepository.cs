@@ -26,8 +26,7 @@ namespace Implementation.Repositories
             _updatedEntities = new List<T>();
             _addedEntities = new List<T>();
             _removedEntities = new List<Guid>();
-            Guid.NewGuid();
-            _dataPath = Path.Join(applicationSettings.ConfigurationFolder, "Repositories");
+            _dataPath = applicationSettings.RepositoryPath!;
             _filePath = Path.Join(_dataPath, $"{repositoryKey}.json");
         }
 

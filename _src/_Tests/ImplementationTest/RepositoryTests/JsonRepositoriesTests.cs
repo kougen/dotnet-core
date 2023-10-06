@@ -70,8 +70,8 @@ namespace ImplementationTest.RepositoryTests
         [Fact]
         public async Task JRT_0021_Given_JsonFile_When_GetAllEntitiesCalled_Then_AllEntitiesReturns()
         {
-            var fileName = @".\Resources\JRT\0021-users";
-            await using var repository = CreateRepositoryFactory(@".\Resources\JRT").CreateJsonRepository<User>(fileName);
+            var fileName = @".\Resources\JRT\0021-users.json";
+            await using var repository = CreateRepositoryFactory(@".\Resources\JRT").CreateJsonRepository<User>("0021-users");
             var allUsers = await repository.GetAllEntities();
             Assert.True(File.Exists(fileName));
             Assert.Equal(4, allUsers.Count());
@@ -81,6 +81,7 @@ namespace ImplementationTest.RepositoryTests
         {
             var mock = new Mock<IApplicationSettings>();
             mock.Setup((a) => a.ConfigurationFolder).Returns(folder);
+            mock.Setup((a) => a.RepositoryPath).Returns(folder);
             return mock.Object;
         }
 
