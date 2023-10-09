@@ -8,7 +8,8 @@ namespace Infrastructure.Repositories
     {
         Task<IEnumerable<T>> GetAllEntitiesAsync();
         IEnumerable<T> GetAllEntities();
-        Task<T?> GetEntity(Guid id);
+        Task<T?> GetEntityAsync(Guid id);
+        T? GetEntity(Guid id);
         IRepository<T> Create(T entity);
         IRepository<T> Delete(Guid id);
         IRepository<T> Update(T entity);

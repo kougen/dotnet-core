@@ -32,16 +32,22 @@ namespace Implementation.Repositories
 
         public async Task<IEnumerable<T>> GetAllEntitiesAsync()
         {
-            return await GetAllContent();
+            return await GetAllContentAsync();
         }
         public IEnumerable<T> GetAllEntities()
         {
-            return GetAllEntitiesAsync().Result;
+            return GetAllContent();
         }
-        
-        public async Task<T?> GetEntity(Guid id)
+        public async Task<T?> GetEntityAsync(Guid id)
         {
-            var allContent = await GetAllContent();
+            var allContent = await GetAllContentAsync();
+            return allContent.FirstOrDefault(e => e.Id.Equals(id));
+            
+        }
+
+        public T? GetEntity(Guid id)
+        {
+            var allContent = GetAllContent();
             return allContent.FirstOrDefault(e => e.Id.Equals(id));
         }
         public IRepository<T> Create(T entity)
@@ -68,7 +74,7 @@ namespace Implementation.Repositories
             }
             CreateRepository();
             _isLocked = true;
-            var currentContent = GetAllContent().Result.ToList();
+            var currentContent = GetAllContent().ToList();
             currentContent.AddRange(_addedEntities);
 
             foreach (var updatedEntity in _updatedEntities)
@@ -123,11 +129,19 @@ namespace Implementation.Repositories
             }
         }
 
-        private async Task<IEnumerable<T>> GetAllContent()
+        private async Task<IEnumerable<T>> GetAllContentAsync()
         {
             await SaveChangesAsync();
             var allContent = await File.ReadAllTextAsync(_filePath);
             var list = await Task.Factory.StartNew(() => JsonConvert.DeserializeObject<IEnumerable<T>>(allContent));
+            return list ?? new List<T>();
+        }
+        
+        private IEnumerable<T> GetAllContent()
+        {
+            SaveChanges();
+            var allContent = File.ReadAllText(_filePath);
+            var list = JsonConvert.DeserializeObject<IEnumerable<T>>(allContent);
             return list ?? new List<T>();
         }
 
@@ -139,7 +153,7 @@ namespace Implementation.Repositories
             }
             await CreateRepositoryAsync();
             _isLocked = true;
-            var currentContent = (await GetAllContent()).ToList();
+            var currentContent = (await GetAllContentAsync()).ToList();
             currentContent.AddRange(_addedEntities);
 
             foreach (var updatedEntity in _updatedEntities)
