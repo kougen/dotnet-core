@@ -52,11 +52,41 @@ namespace ImplementationTest.RepositoryTests
                     Name = "Peter",
                     Age = 25
                 };
-                await repository.Create(user).SaveChanges();
+                await repository.Create(user).SaveChangesAsync();
                 var jsonString = $"[{{\"Id\":\"{user.Id}\",\"Name\":\"{user.Name}\",\"Age\":{user.Age}}}]";
 
                 Assert.True(File.Exists(fileName));
                 Assert.Equal(jsonString, await File.ReadAllTextAsync(fileName));
+            }
+            finally
+            {
+                if (File.Exists($@".\data\users-{id}.json"))
+                {
+                    File.Delete(fileName);
+                }
+            }
+        }
+        
+        [Fact]
+        public void JRT_0011_Given_EmptyRepository_When_CreateEntityCalledSynchronously_Then_EntityCreated()
+        {
+            var id = Guid.NewGuid();
+            var fileName = $@".\data\users-{id}.json";
+            
+            try
+            {
+                using var repository = CreateRepositoryFactory(@".\data").CreateJsonRepository<User>($"users-{id}");
+                var user = new User
+                {
+                    Name = "Peter",
+                    Age = 25
+                };
+                repository.Create(user);
+                repository.SaveChanges();
+                var jsonString = $"[{{\"Id\":\"{user.Id}\",\"Name\":\"{user.Name}\",\"Age\":{user.Age}}}]";
+
+                Assert.True(File.Exists(fileName));
+                Assert.Equal(jsonString, File.ReadAllText(fileName));
             }
             finally
             {
@@ -72,7 +102,7 @@ namespace ImplementationTest.RepositoryTests
         {
             var fileName = @".\Resources\JRT\0021-users.json";
             await using var repository = CreateRepositoryFactory(@".\Resources\JRT").CreateJsonRepository<User>("0021-users");
-            var allUsers = await repository.GetAllEntities();
+            var allUsers = await repository.GetAllEntitiesAsync();
             Assert.True(File.Exists(fileName));
             Assert.Equal(4, allUsers.Count());
         }

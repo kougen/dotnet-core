@@ -30,10 +30,15 @@ namespace Implementation.Repositories
             _filePath = Path.Join(_dataPath, $"{repositoryKey}.json");
         }
 
-        public async Task<IEnumerable<T>> GetAllEntities()
+        public async Task<IEnumerable<T>> GetAllEntitiesAsync()
         {
             return await GetAllContent();
         }
+        public IEnumerable<T> GetAllEntities()
+        {
+            return GetAllEntitiesAsync().Result;
+        }
+        
         public async Task<T?> GetEntity(Guid id)
         {
             var allContent = await GetAllContent();
@@ -54,8 +59,43 @@ namespace Implementation.Repositories
             _updatedEntities.Add(entity);
             return this;
         }
+       
+        public IRepository<T> SaveChanges()
+        {
+            if (_isLocked)
+            {
+                return this;
+            }
+            CreateRepository();
+            _isLocked = true;
+            var currentContent = GetAllContent().Result.ToList();
+            currentContent.AddRange(_addedEntities);
 
-        private async Task CreateRepository()
+            foreach (var updatedEntity in _updatedEntities)
+            {
+                var target = currentContent.FirstOrDefault(e => e.Id.Equals(updatedEntity.Id));
+                if (target != null)
+                {
+                    currentContent.Remove(target);
+                    currentContent.Add(updatedEntity);
+                }
+            }
+
+            foreach (var id in _removedEntities)
+            {
+                if (currentContent.Any(e => e.Id.Equals(id)))
+                {
+                    currentContent.Remove(currentContent.First(e => e.Id.Equals(id)));
+                }
+            }
+
+            var newContent = JsonConvert.SerializeObject(currentContent);
+            File.WriteAllText(_filePath, newContent);
+            _isLocked = false;
+            return this;
+        }
+
+        private async Task CreateRepositoryAsync()
         {
             if (!Directory.Exists(_dataPath))
             {
@@ -68,21 +108,36 @@ namespace Implementation.Repositories
                 await File.AppendAllTextAsync(_filePath, "[]");
             }
         }
+        
+        private void CreateRepository()
+        {
+            if (!Directory.Exists(_dataPath))
+            {
+                Directory.CreateDirectory(_dataPath);
+            }
+
+            if (!File.Exists(_filePath))
+            {
+                File.Create(_filePath).Close();
+                File.AppendAllText(_filePath, "[]");
+            }
+        }
 
         private async Task<IEnumerable<T>> GetAllContent()
         {
-            await SaveChanges();
+            await SaveChangesAsync();
             var allContent = await File.ReadAllTextAsync(_filePath);
-            return await Task.Factory.StartNew(() => JsonConvert.DeserializeObject<IEnumerable<T>>(allContent));
+            var list = await Task.Factory.StartNew(() => JsonConvert.DeserializeObject<IEnumerable<T>>(allContent));
+            return list ?? new List<T>();
         }
 
-        public async Task<IRepository<T>> SaveChanges()
+        public async Task<IRepository<T>> SaveChangesAsync()
         {
             if (_isLocked)
             {
                 return await Task.FromResult<IRepository<T>>(this);
             }
-            await CreateRepository();
+            await CreateRepositoryAsync();
             _isLocked = true;
             var currentContent = (await GetAllContent()).ToList();
             currentContent.AddRange(_addedEntities);
@@ -113,17 +168,12 @@ namespace Implementation.Repositories
 
         public async ValueTask DisposeAsync()
         {
-            await SaveChanges();
+            await SaveChangesAsync();
         }
 
         public void Dispose()
         {
-            new Task(Action).RunSynchronously();
-        }
-
-        private async void Action()
-        {
-            await SaveChanges();
+            SaveChanges();
         }
     }
 }
