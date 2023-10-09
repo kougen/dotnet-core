@@ -11,20 +11,20 @@ using Infrastructure.Configuration.Factories;
 using Infrastructure.IO;
 using Infrastructure.IO.Factories;
 using Infrastructure.Logger;
+using Infrastructure.Module;
 using Infrastructure.Navigator.Factories;
 using Infrastructure.Repositories.Factories;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Implementation.Module
 {
-    public class CoreModule
+    public class CoreModule : IGeneralModule
     {
-        public static void LoadModules(IServiceCollection collection, string projectName)
+        public void LoadModules(IServiceCollection collection, string projectNamespace)
         {
-            var mainFolder = Path.Join("joshika39", projectName);
+            var mainFolder = Path.Join("joshika39", projectNamespace);
             var userFolder = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), mainFolder);
             collection.AddScoped<ILogger, Logger.Logger>(_ => new Logger.Logger(Guid.NewGuid()));
-            
             collection.AddTransient<IIOFactory, IOFactory>();
             collection.AddTransient<INavigatorFactory, NavigatorFactory>();
             collection.AddTransient<INavigatorElementFactory, NavigatorElementFactory>();

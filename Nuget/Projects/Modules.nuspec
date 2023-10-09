@@ -8,6 +8,7 @@
 		<dependencies>
 			<group targetFramework="net6.0">
 				<dependency id="Microsoft.Extensions.DependencyInjection" version="7.0.0" />
+				<dependency id="Newtonsoft.Json" version="13.0.3" />
 			</group>
 		</dependencies>
 	</metadata>
