@@ -53,8 +53,8 @@ namespace ImplementationTest.RepositoryTests
                     Age = 25
                 };
                 await repository.Create(user).SaveChangesAsync();
-                var jsonString = $"[{{\"Id\":\"{user.Id}\",\"Name\":\"{user.Name}\",\"Age\":{user.Age}}}]";
-
+                var jsonString = $"[{{\"Name\":\"{user.Name}\",\"Age\":{user.Age},\"Id\":\"{user.Id}\"}}]";
+                
                 Assert.True(File.Exists(fileName));
                 Assert.Equal(jsonString, await File.ReadAllTextAsync(fileName));
             }
@@ -76,14 +76,14 @@ namespace ImplementationTest.RepositoryTests
             try
             {
                 using var repository = CreateRepositoryFactory(@".\data").CreateJsonRepository<IUser, User>($"users-{id}");
-                var user = new User
+                var user = new User()
                 {
                     Name = "Peter",
                     Age = 25
                 };
                 repository.Create(user);
                 repository.SaveChanges();
-                var jsonString = $"[{{\"Id\":\"{user.Id}\",\"Name\":\"{user.Name}\",\"Age\":{user.Age}}}]";
+                var jsonString = $"[{{\"Name\":\"{user.Name}\",\"Age\":{user.Age},\"Id\":\"{user.Id}\"}}]";
                 var text = File.ReadAllText(fileName);
                 Assert.True(File.Exists(fileName));
                 Assert.Equal(jsonString, text);
@@ -102,9 +102,11 @@ namespace ImplementationTest.RepositoryTests
         {
             var fileName = @".\Resources\JRT\0021-users.json";
             await using var repository = CreateRepositoryFactory(@".\Resources\JRT").CreateJsonRepository<IUser, User>("0021-users");
-            var allUsers = await repository.GetAllEntitiesAsync();
+            var allUsers = (await repository.GetAllEntitiesAsync()).ToList();
+            var guid = Guid.Parse("061e971d-5ca2-4b9f-998f-66766b06c4ce");
             Assert.True(File.Exists(fileName));
-            Assert.Equal(4, allUsers.Count());
+            Assert.Equal(4, allUsers.Count);
+            Assert.Equal(allUsers.First().Id, guid);
         }
 
         private IApplicationSettings CreateMockApplicationSettings(string folder)

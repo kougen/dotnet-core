@@ -5,7 +5,7 @@ namespace ImplementationTest.RepositoryTests.Model
 {
     public interface IUser : IEntity
     {
-        public string Name { get; set; }
-        public int Age { get; set; }
+        string Name { get; set; }
+        int Age { get; set; }
     }
 }
