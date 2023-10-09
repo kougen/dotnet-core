@@ -2,6 +2,8 @@ namespace Infrastructure.Repositories.Factories
 {
     public interface IRepositoryFactory
     {
-        IRepository<T> CreateJsonRepository<T>(string repositoryName) where T: IEntity;
+        IRepository<TInterface> CreateJsonRepository<TInterface, T>(string repositoryName)
+            where TInterface : class, IEntity
+            where T : class, TInterface;
     }
 }

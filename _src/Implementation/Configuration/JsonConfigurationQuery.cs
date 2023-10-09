@@ -96,7 +96,7 @@ namespace Implementation.Configuration
         {
             var content = await File.ReadAllTextAsync(_filePath);
             var jsonObject = SetJsonObject(JObject.Parse(content), path, value);
-            await File.WriteAllTextAsync(_filePath, jsonObject.ToString(Formatting.Indented));
+            await File.WriteAllTextAsync(_filePath, jsonObject.ToString());
         }
         #endregion
 
@@ -120,7 +120,7 @@ namespace Implementation.Configuration
         {
             var content = File.ReadAllText(_filePath);
             var jsonObject = SetJsonObject(JObject.Parse(content), path, value);
-            File.WriteAllText(_filePath, jsonObject.ToString(Formatting.Indented));
+            File.WriteAllText(_filePath, jsonObject.ToString());
         }
         #endregion
         #endregion

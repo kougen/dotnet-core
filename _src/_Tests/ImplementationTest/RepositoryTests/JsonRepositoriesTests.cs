@@ -23,7 +23,7 @@ namespace ImplementationTest.RepositoryTests
             var fileName = $@".\data\users-{id}.json";
             try
             {
-                await using var repository = CreateRepositoryFactory(@".\data").CreateJsonRepository<User>($"users-{id}");
+                await using var repository = CreateRepositoryFactory(@".\data").CreateJsonRepository<IUser, User>($"users-{id}");
                 await repository.DisposeAsync();
                 Assert.True(File.Exists(fileName));
                 var text = await File.ReadAllTextAsync(fileName);
@@ -46,7 +46,7 @@ namespace ImplementationTest.RepositoryTests
             
             try
             {
-                await using var repository = CreateRepositoryFactory(@".\data").CreateJsonRepository<User>($"users-{id}");
+                await using var repository = CreateRepositoryFactory(@".\data").CreateJsonRepository<IUser, User>($"users-{id}");
                 var user = new User
                 {
                     Name = "Peter",
@@ -75,7 +75,7 @@ namespace ImplementationTest.RepositoryTests
             
             try
             {
-                using var repository = CreateRepositoryFactory(@".\data").CreateJsonRepository<User>($"users-{id}");
+                using var repository = CreateRepositoryFactory(@".\data").CreateJsonRepository<IUser, User>($"users-{id}");
                 var user = new User
                 {
                     Name = "Peter",
@@ -84,9 +84,9 @@ namespace ImplementationTest.RepositoryTests
                 repository.Create(user);
                 repository.SaveChanges();
                 var jsonString = $"[{{\"Id\":\"{user.Id}\",\"Name\":\"{user.Name}\",\"Age\":{user.Age}}}]";
-
+                var text = File.ReadAllText(fileName);
                 Assert.True(File.Exists(fileName));
-                Assert.Equal(jsonString, File.ReadAllText(fileName));
+                Assert.Equal(jsonString, text);
             }
             finally
             {
@@ -101,7 +101,7 @@ namespace ImplementationTest.RepositoryTests
         public async Task JRT_0021_Given_JsonFile_When_GetAllEntitiesCalled_Then_AllEntitiesReturns()
         {
             var fileName = @".\Resources\JRT\0021-users.json";
-            await using var repository = CreateRepositoryFactory(@".\Resources\JRT").CreateJsonRepository<User>("0021-users");
+            await using var repository = CreateRepositoryFactory(@".\Resources\JRT").CreateJsonRepository<IUser, User>("0021-users");
             var allUsers = await repository.GetAllEntitiesAsync();
             Assert.True(File.Exists(fileName));
             Assert.Equal(4, allUsers.Count());

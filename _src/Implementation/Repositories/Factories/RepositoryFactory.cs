@@ -14,9 +14,11 @@ namespace Implementation.Repositories.Factories
             _applicationSettings = applicationSettings ?? throw new ArgumentNullException(nameof(applicationSettings));
         }
         
-        public IRepository<T> CreateJsonRepository<T>(string repositoryName) where T : IEntity
+        public IRepository<TInterface> CreateJsonRepository<TInterface, T>(string repositoryName) 
+            where TInterface : class, IEntity
+            where T : class, TInterface
         {
-            return new DefaultJsonRepository<T>(_applicationSettings, repositoryName);
+            return new DefaultJsonRepository<TInterface, T>(_applicationSettings, repositoryName);
         }
     }
 }
