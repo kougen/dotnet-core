@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace Implementation.Tools
 {
@@ -30,6 +31,25 @@ namespace Implementation.Tools
             }
                 
             return true;        
+        }
+
+        public static void CreateFileAndDirectory(string path)
+        {
+            var directory = Path.GetDirectoryName(path) ?? "";
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            if (File.Exists(path)) return;
+            
+            File.Create(path).Close();
+        }
+        
+        public static void CreateFileAndDirectory(string path, string defaultContent)
+        {
+            CreateFileAndDirectory(path);
+            File.WriteAllText(path, defaultContent);
         }
     }
 }
