@@ -83,30 +83,11 @@ namespace Implementation.Repositories
             {
                 return this;
             }
+            
             CreateRepository();
             _isLocked = true;
-            var currentContent = GetAllContent().ToList();
-            currentContent.AddRange(_addedEntities);
-
-            foreach (var updatedEntity in _updatedEntities)
-            {
-                var target = currentContent.FirstOrDefault(e => e.Id.Equals(updatedEntity.Id));
-                if (target != null)
-                {
-                    currentContent.Remove(target);
-                    currentContent.Add(updatedEntity);
-                }
-            }
-
-            foreach (var id in _removedEntities)
-            {
-                if (currentContent.Any(e => e.Id.Equals(id)))
-                {
-                    currentContent.Remove(currentContent.First(e => e.Id.Equals(id)));
-                }
-            }
             
-            var newContent = JsonConvert.SerializeObject(currentContent, _settings);
+            var newContent = JsonConvert.SerializeObject(PerformSave(GetAllContent().ToList()), _settings);
             File.WriteAllText(_filePath, newContent);
             _isLocked = false;
             return this;
@@ -160,32 +141,41 @@ namespace Implementation.Repositories
         {
             if (_isLocked)
             {
-                return await Task.FromResult<IRepository<TInterface>>(this);
+                return this;
             }
             await CreateRepositoryAsync();
             _isLocked = true;
-            var currentContent = (await GetAllContentAsync()).ToList();
-            
-            foreach (var addedEntity in _addedEntities)
+            var currentContent = PerformSave((await GetAllContentAsync()).ToList());
+            var newContent = await Task.Factory.StartNew(() => JsonConvert.SerializeObject(currentContent, _settings));
+            await File.WriteAllTextAsync(_filePath, newContent);
+            _isLocked = false;
+            return await Task.FromResult<IRepository<TInterface>>(this);
+        }
+
+        private ICollection<TInterface> PerformSave(ICollection<TInterface> currentContent)
+        {
+            for (var index = 0; index < _addedEntities.Count; index++)
             {
+                var addedEntity = _addedEntities[index];
                 if (currentContent.Any(e => e.Id.Equals(addedEntity.Id)))
                 {
                     throw new InvalidOperationException("Entity to add already exists in the repository");
                 }
-                
+
                 currentContent.Add(addedEntity);
                 _addedEntities.Remove(addedEntity);
             }
 
-            foreach (var updatedEntity in _updatedEntities)
+            for (var index = 0; index < _updatedEntities.Count; index++)
             {
+                var updatedEntity = _updatedEntities[index];
                 var target = currentContent.FirstOrDefault(e => e.Id.Equals(updatedEntity.Id));
-                
+
                 if (target == null)
                 {
                     throw new InvalidOperationException("Entity to update not found in the repository");
                 }
-                
+
                 currentContent.Remove(target);
                 currentContent.Add(updatedEntity);
                 _updatedEntities.Remove(updatedEntity);
@@ -201,12 +191,9 @@ namespace Implementation.Repositories
                 _removedEntities.Remove(id);
             }
 
-            var newContent = await Task.Factory.StartNew(() => JsonConvert.SerializeObject(currentContent, _settings));
-            await File.WriteAllTextAsync(_filePath, newContent);
-            _isLocked = false;
-            return await Task.FromResult<IRepository<TInterface>>(this);
+            return currentContent;
         }
-
+        
         public async ValueTask DisposeAsync()
         {
             await SaveChangesAsync();
