@@ -165,24 +165,40 @@ namespace Implementation.Repositories
             await CreateRepositoryAsync();
             _isLocked = true;
             var currentContent = (await GetAllContentAsync()).ToList();
-            currentContent.AddRange(_addedEntities);
+            
+            foreach (var addedEntity in _addedEntities)
+            {
+                if (currentContent.Any(e => e.Id.Equals(addedEntity.Id)))
+                {
+                    throw new InvalidOperationException("Entity to add already exists in the repository");
+                }
+                
+                currentContent.Add(addedEntity);
+                _addedEntities.Remove(addedEntity);
+            }
 
             foreach (var updatedEntity in _updatedEntities)
             {
                 var target = currentContent.FirstOrDefault(e => e.Id.Equals(updatedEntity.Id));
-                if (target != null)
+                
+                if (target == null)
                 {
-                    currentContent.Remove(target);
-                    currentContent.Add(updatedEntity);
+                    throw new InvalidOperationException("Entity to update not found in the repository");
                 }
+                
+                currentContent.Remove(target);
+                currentContent.Add(updatedEntity);
+                _updatedEntities.Remove(updatedEntity);
             }
 
             foreach (var id in _removedEntities)
             {
-                if (currentContent.Any(e => e.Id.Equals(id)))
+                if (!currentContent.Any(e => e.Id.Equals(id)))
                 {
-                    currentContent.Remove(currentContent.First(e => e.Id.Equals(id)));
+                    throw new InvalidOperationException("Entity to remove not found in the repository");
                 }
+                currentContent.Remove(currentContent.First(e => e.Id.Equals(id)));
+                _removedEntities.Remove(id);
             }
 
             var newContent = await Task.Factory.StartNew(() => JsonConvert.SerializeObject(currentContent, _settings));
