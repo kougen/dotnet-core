@@ -120,6 +120,28 @@ namespace ImplementationTest.RepositoryTests
             Assert.Equal(4, allUsers.Count);
             Assert.Equal(allUsers.First().Id, guid);
         }
+        
+        [Fact]
+        public void JRT_0031_Given_JsonFile_When_DeleteFirstFromRepository_Then_EntityIsDeleted()
+        {
+            var id = Guid.NewGuid();
+            var fileName = @".\Resources\JRT\0021-users.json";
+            var tempFileName = @$".\Resources\JRT\{id}.json";
+            File.Copy(fileName, tempFileName);
+            using var repository = CreateRepositoryFactory(@".\Resources\JRT").CreateJsonRepository<IUser, User>(id.ToString());
+            var fistUser = repository.GetAllEntities().First();
+            repository.Delete(fistUser.Id).SaveChanges();
+            Assert.True(File.Exists(tempFileName));
+            var newCollection = repository.GetAllEntities().ToList();
+            Assert.Equal(3, newCollection.Count);
+            var guid = Guid.Parse("b4b19e46-b845-4181-9ebe-ed7f5eafbd0d");
+            Assert.Equal(newCollection.First().Id, guid);
+            if (File.Exists(tempFileName))
+            {
+                File.Delete(tempFileName);
+            }
+            Assert.False(File.Exists(tempFileName));
+        }
 
         private IApplicationSettings CreateMockApplicationSettings(string folder)
         {

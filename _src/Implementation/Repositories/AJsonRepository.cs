@@ -180,14 +180,12 @@ namespace Implementation.Repositories
                 currentContent.Add(updatedEntity);
                 _updatedEntities.Remove(updatedEntity);
             }
-
-            foreach (var id in _removedEntities)
+            
+            for (var index = 0; index < _removedEntities.Count; index++)
             {
-                if (!currentContent.Any(e => e.Id.Equals(id)))
-                {
-                    throw new InvalidOperationException("Entity to remove not found in the repository");
-                }
+                var id = _removedEntities[index];
                 currentContent.Remove(currentContent.First(e => e.Id.Equals(id)));
+                
                 _removedEntities.Remove(id);
             }
 

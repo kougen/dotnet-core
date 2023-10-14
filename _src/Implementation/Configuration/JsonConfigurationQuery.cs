@@ -42,7 +42,7 @@ namespace Implementation.Configuration
         {
             var jsonString = await File.ReadAllTextAsync(_filePath);
             var token = GetToken(path, jsonString);
-            return token == null ? default : JsonConvert.DeserializeObject<T>(token?.ToString());
+            return token == null ? default : JsonConvert.DeserializeObject<T>(token.ToString());
         }
         #endregion
 
