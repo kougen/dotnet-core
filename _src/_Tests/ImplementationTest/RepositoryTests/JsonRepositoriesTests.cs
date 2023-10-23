@@ -24,6 +24,7 @@ namespace ImplementationTest.RepositoryTests
             try
             {
                 await using var repository = CreateRepositoryFactory(@".\data").CreateJsonRepository<IUser, User>($"users-{id}");
+                await repository.SaveChangesAsync();
                 Assert.True(File.Exists(fileName));
                 var text = await File.ReadAllTextAsync(fileName);
                 Assert.Equal("[]", text);
