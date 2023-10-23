@@ -20,12 +20,12 @@ namespace Implementation.Application
             ConfigurationFolder = configurationFolder ?? throw new ArgumentNullException(nameof(configurationFolder));
             ApplicationConfigurationFile = Path.Join(ConfigurationFolder, "config.json");
             _configQuery = queryFactory.CreateConfigurationQuery(ApplicationConfigurationFile);
-            _configQuery.SetAttribute("general.repositories", Path.Join(ConfigurationFolder, "Repositories"));;
+            _configQuery.SetAttribute("general.repositories", Path.Join(ConfigurationFolder, "Repositories"));
         }
 
         private string? GetRepositoryPath()
         {
-            return _configQuery.GetStringAttributeAsync("general.repositories").Result;
+            return _configQuery.GetStringAttribute("general.repositories");
         }
     }
 }

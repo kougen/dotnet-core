@@ -24,7 +24,6 @@ namespace ImplementationTest.RepositoryTests
             try
             {
                 await using var repository = CreateRepositoryFactory(@".\data").CreateJsonRepository<IUser, User>($"users-{id}");
-                await repository.DisposeAsync();
                 Assert.True(File.Exists(fileName));
                 var text = await File.ReadAllTextAsync(fileName);
                 Assert.Equal("[]", text);
@@ -106,7 +105,7 @@ namespace ImplementationTest.RepositoryTests
             var guid = Guid.Parse("061e971d-5ca2-4b9f-998f-66766b06c4ce");
             Assert.True(File.Exists(fileName));
             Assert.Equal(4, allUsers.Count);
-            Assert.Equal(allUsers.First().Id, guid);
+            Assert.Equal(allUsers[0].Id, guid);
         }
         
         [Fact]
@@ -118,7 +117,7 @@ namespace ImplementationTest.RepositoryTests
             var guid = Guid.Parse("061e971d-5ca2-4b9f-998f-66766b06c4ce");
             Assert.True(File.Exists(fileName));
             Assert.Equal(4, allUsers.Count);
-            Assert.Equal(allUsers.First().Id, guid);
+            Assert.Equal(allUsers[0].Id, guid);
         }
         
         [Fact]
@@ -135,7 +134,7 @@ namespace ImplementationTest.RepositoryTests
             var newCollection = repository.GetAllEntities().ToList();
             Assert.Equal(3, newCollection.Count);
             var guid = Guid.Parse("b4b19e46-b845-4181-9ebe-ed7f5eafbd0d");
-            Assert.Equal(newCollection.First().Id, guid);
+            Assert.Equal(newCollection[0].Id, guid);
             if (File.Exists(tempFileName))
             {
                 File.Delete(tempFileName);
