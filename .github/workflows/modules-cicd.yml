@@ -96,8 +96,10 @@ jobs:
       shell: pwsh
       run: '& .\dotnet-tools\PackPackages.ps1 -CustomProjectsFile .projects.conf'
 
-    - name: Push Modules
+    - name: Push to NuGet Modules
       shell: pwsh
-      run: |
-        '& .\dotnet-tools\PushPackages.ps1 -CustomProjectsFile .projects.conf -Source https://api.nuget.org/v3/index.json -ApiKey  ${{secrets.NUGET_API_KEY}}'
-        '& .\dotnet-tools\PushPackages.ps1 -CustomProjectsFile .projects.conf -Source https://nuget.pkg.github.com/joshika39/index.json -ApiKey  ${{secrets.GIT_API_KEY}}'
+      run: '& .\dotnet-tools\PushPackages.ps1 -CustomProjectsFile .projects.conf -Source https://api.nuget.org/v3/index.json -ApiKey  ${{secrets.NUGET_API_KEY}}'
+
+    - name: Push to GitHub Modules
+      shell: pwsh
+      run: '& .\dotnet-tools\PushPackages.ps1 -CustomProjectsFile .projects.conf -Source https://nuget.pkg.github.com/joshika39/index.json -ApiKey  ${{secrets.GIT_API_KEY}}'
