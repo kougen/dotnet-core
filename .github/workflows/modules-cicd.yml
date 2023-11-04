@@ -6,6 +6,57 @@ on:
       - "*v*"
     
 jobs:
+  build:
+    name: Build
+    env:
+      BUILD_CONFIG: 'Debug'
+      SOLUTION: 'Modules.sln'
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          submodules: recursive
+      - name: 'Get Version'
+        id: get_version
+        uses: battila7/get-version-action@v2
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.11
+      - name: Cache SonarQube packages
+        uses: actions/cache@v1
+        with:
+          path: ~\sonar\cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+      - name: Cache SonarQube scanner
+        id: cache-sonar-scanner
+        uses: actions/cache@v1
+        with:
+          path: .\.sonar\scanner
+          key: ${{ runner.os }}-sonar-scanner
+          restore-keys: ${{ runner.os }}-sonar-scanner
+      - name: Install SonarQube scanner
+        if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
+        shell: powershell
+        run: |
+          New-Item -Path .\.sonar\scanner -ItemType Directory
+          dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
+      - name: Install dotCover Global
+        shell: powershell
+        run: |
+          dotnet tool install --global JetBrains.dotCover.GlobalTool
+      - name: Build and analyze
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: powershell
+        run: |
+          Write-Output ${{ steps.get_version.outputs.version-without-v }}
+          .\.sonar\scanner\dotnet-sonarscanner begin /k:"${{ secrets.SONAR_PROJECT }}" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="${{ secrets.SONAR_HOST_URL }}" /v:"${{ steps.get_version.outputs.version-without-v }}"
+          dotnet build $env:SOLUTION --configuration $env:BUILD_CONFIG
+          dotnet dotcover test $env:SOLUTION --dcReportType=HTML --dotCoverFilters="-:*Tests;-:testhost"
+          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
   deploy:
     name: 'Build, Test & Deploy'
     env:
@@ -43,9 +94,10 @@ jobs:
       
     - name: Pack Modules
       shell: pwsh
-      run: '& .\dotnet-tools\PushArtifact.ps1 -Version ${{ steps.get_version.outputs.version-without-v }} -EnvFile .\.env'
+      run: '& .\dotnet-tools\PushPackages.ps1 -CustomProjectsFile .projects.conf'
 
-    - name: Publish
+    - name: Push Modules
+      shell: pwsh
       run: |
-        dotnet nuget push .\Nuget\Packages\${{ steps.get_version.outputs.version }}\*.nupkg --source 'https://api.nuget.org/v3/index.json' --api-key ${{secrets.NUGET_API_KEY}}
-        dotnet nuget push .\Nuget\Packages\${{ steps.get_version.outputs.version }}\*.nupkg --source 'https://nuget.pkg.github.com/joshika39/index.json' --api-key ${{secrets.GIT_API_KEY}}
+        '& .\dotnet-tools\PushPackages.ps1 -CustomProjectsFile .projects.conf -Source https://api.nuget.org/v3/index.json -ApiKey  ${{secrets.NUGET_API_KEY}}'
+        '& .\dotnet-tools\PushPackages.ps1 -CustomProjectsFile .projects.conf -Source https://nuget.pkg.github.com/joshika39/index.json -ApiKey  ${{secrets.GIT_API_KEY}}'
