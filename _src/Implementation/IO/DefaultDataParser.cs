@@ -36,5 +36,19 @@ namespace Implementation.IO
 
             return convertedLines;
         }
+        
+        public IEnumerable<IEnumerable<T>> MultiTryParse<T>(string input, IDataParser.TryParseHandler<T> handler, out bool isOkay, char separator, params char[] separators)
+        {
+            isOkay = false;
+            var convertedLines = new List<IEnumerable<T>>();
+            var lines = input.Split(Environment.NewLine);
+
+            foreach (var line in lines)
+            {
+                convertedLines.Add(TryParse(line, handler, out isOkay, separator, separators));
+            }
+            
+            return convertedLines;
+        }
     }
 }

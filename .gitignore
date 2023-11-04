@@ -761,3 +761,5 @@ fabric.properties
 .idea/
 
 .cred*
+
+.obsidian/

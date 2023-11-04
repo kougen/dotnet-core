@@ -176,7 +176,7 @@ namespace Implementation.IO
                 var test1 = LastChars(sb, 2);
 
 
-                if (!useEndOfFile && test1 is "\r\n" or "\n\r")
+                if (!useEndOfFile && test1 == Environment.NewLine)
                 {
                     return sb.ToString();
                 }
