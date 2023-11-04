@@ -23,7 +23,7 @@ Here are some highlights:
 │   |   |   |   ├── somedb.json
 └──────────────────────────
 ```
-## How to use
+## How to start
 
 First you have to create a new [`ServiceCollection`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.extensions.dependencyinjection.servicecollection?view=dotnet-plat-ext-7.0) and then create an instance from the `CoreModule` class.
 
@@ -40,5 +40,8 @@ new CoreModule().LoadModules(collection, "reader-tests");
 var provider = collection.BuildServiceProvider();
 ```
 
+## Next steps
+
+Follow up: **[Using the package]()**
 ## References
 - [Dependency injection guidelines - .NET | Microsoft Learn](https://learn.microsoft.com/en-us/dotnet/core/extensions/dependency-injection-guidelines)
