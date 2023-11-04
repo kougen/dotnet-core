@@ -1,14 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using Implementation.IO.Factories;
-using Implementation.Logger.Factories;
-using Implementation.Navigator;
-using Implementation.Navigator.Factories;
-using Infrastructure;
-using Infrastructure.Application;
+﻿using Infrastructure.Application;
 using Infrastructure.IO;
-using Infrastructure.Logger;
-using Infrastructure.Navigator;
 using Infrastructure.Navigator.Factories;
 using Microsoft.Extensions.DependencyInjection;
 
