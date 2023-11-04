@@ -11,7 +11,7 @@ namespace Infrastructure.IO
         delegate bool TryParseHandler<T>(string value, out T result);
         
         T? TryParse<T>(string input, TryParseHandler<T> handler, out bool isOkay);
-        
         IEnumerable<T> TryParse<T>(string input, TryParseHandler<T> handler, out bool isOkay, char separator, params char[] separators);
+        IEnumerable<IEnumerable<T>> MultiTryParse<T>(string input, TryParseHandler<T> handler, out bool isOkay, char separator, params char[] separators);
     }
 }
