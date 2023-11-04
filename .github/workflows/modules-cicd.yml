@@ -94,7 +94,7 @@ jobs:
       
     - name: Pack Modules
       shell: pwsh
-      run: '& .\dotnet-tools\PushPackages.ps1 -CustomProjectsFile .projects.conf'
+      run: '& .\dotnet-tools\PackPackages.ps1 -CustomProjectsFile .projects.conf'
 
     - name: Push Modules
       shell: pwsh
