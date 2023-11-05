@@ -42,6 +42,6 @@ var provider = collection.BuildServiceProvider();
 
 ## Next steps
 
-Follow up: **[Using the package]()**
+Follow up: **[Using the package](https://github.com/joshika39/cs-tools/wiki/Using-the-package)**
 ## References
 - [Dependency injection guidelines - .NET | Microsoft Learn](https://learn.microsoft.com/en-us/dotnet/core/extensions/dependency-injection-guidelines)
