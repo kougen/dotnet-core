@@ -4,11 +4,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Implementation.Time;
 using Infrastructure.Time;
 using Infrastructure.Time.Listeners;
 
-namespace GameFramework.Impl.Time
+namespace Implementation.Time
 {
     internal sealed class DefaultStopwatch : IStopwatch
     {

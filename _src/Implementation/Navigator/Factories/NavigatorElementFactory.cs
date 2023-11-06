@@ -4,7 +4,7 @@ using Infrastructure.Navigator.Factories;
 
 namespace Implementation.Navigator.Factories
 {
-    public class NavigatorElementFactory : INavigatorElementFactory
+    internal class NavigatorElementFactory : INavigatorElementFactory
     {
 
         public INavigatorElement<T> CreateNavigatorElement<T>(string displayText, T value)

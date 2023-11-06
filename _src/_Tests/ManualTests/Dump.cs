@@ -15,7 +15,6 @@ namespace ManualTests
             Console.ReadLine();
             var provider = new Core().LoadModules();
             var elemFact = provider.GetService<INavigatorElementFactory>();
-            // var test = _reader.ReadAllLines("Adjon meg hosszu szoveget");
             var elements = new List<INavigatorElement<string>>()
             {
                 elemFact.CreateNavigatorElement("asd", "asdValue"),

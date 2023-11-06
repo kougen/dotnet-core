@@ -10,7 +10,13 @@ namespace Infrastructure.Module
         /// <summary>
         /// Registers the services.
         /// </summary>
-        /// <param name="collection">The <see cref="IServiceCollection"/> created in the composition root.</param>
-        void RegisterServices(IServiceCollection collection);
+        /// <returns>Returns self after registered the services</returns>
+        IServiceCollection RegisterServices();
+        
+        /// <summary>
+        /// Registers the services of a different module.
+        /// </summary>
+        /// <param name="module">Other module</param>
+        IModule RegisterOtherServices(IBaseModule module);
     }
 }

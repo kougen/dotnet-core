@@ -10,8 +10,7 @@ namespace Infrastructure.Module
         /// <summary>
         /// Registers the services.
         /// </summary>
-        /// <param name="collection">The <see cref="IServiceCollection"/> created in the composition root.</param>
         /// <param name="projectNamespace">The name of the project which uses this module</param>
-        void RegisterServices(IServiceCollection collection, string projectNamespace);
+        void RegisterServices(string projectNamespace);
     }
 }

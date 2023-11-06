@@ -1,5 +1,4 @@
 using System.Threading;
-using GameFramework.Impl.Time;
 using Infrastructure.Time;
 using Infrastructure.Time.Factories;
 

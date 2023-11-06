@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Implementation.IO;
 using Implementation.Module;
 using Infrastructure.IO;
@@ -17,7 +18,7 @@ namespace ImplementationTest
         public ReaderTests()
         {
             var collection = new ServiceCollection();
-            new CoreModule().RegisterServices(collection, "reader-tests");
+            new CoreModule(collection, new CancellationTokenSource()).RegisterServices("reader-tests");
             _provider = collection.BuildServiceProvider();
         }
 

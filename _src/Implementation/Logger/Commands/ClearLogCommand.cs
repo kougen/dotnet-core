@@ -5,7 +5,7 @@ using Infrastructure.Commands;
 
 namespace Implementation.Logger.Commands
 {
-    public class ClearLogCommand : ICommand<bool>
+    internal class ClearLogCommand : ICommand<bool>
     {
         private readonly string _path;
 

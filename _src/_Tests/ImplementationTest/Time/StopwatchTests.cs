@@ -1,6 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
-using GameFramework.Impl.Time;
+using Implementation.Time;
 using Infrastructure.Time;
 using Infrastructure.Time.Listeners;
 using Moq;

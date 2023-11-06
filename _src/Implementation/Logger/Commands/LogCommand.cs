@@ -6,7 +6,7 @@ using Infrastructure.Commands;
 
 namespace Implementation.Logger.Commands
 {
-    public class LogCommand : ICommand<string>
+    internal class LogCommand : ICommand<string>
     {
         private readonly string _filePath;
         private readonly string _content;
@@ -29,7 +29,7 @@ namespace Implementation.Logger.Commands
                 throw new FileNotFoundException("Log file does not exists!");
             }
 
-            using (var streamWriter = new StreamWriter(_filePath, true, Encoding.ASCII))
+            await using (var streamWriter = new StreamWriter(_filePath, true, Encoding.ASCII))
             {
                 await streamWriter.WriteAsync(_content);
             }

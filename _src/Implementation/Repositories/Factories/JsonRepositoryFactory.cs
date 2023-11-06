@@ -5,7 +5,7 @@ using Infrastructure.Repositories.Factories;
 
 namespace Implementation.Repositories.Factories
 {
-    public class RepositoryFactory : IRepositoryFactory
+    internal class RepositoryFactory : IRepositoryFactory
     {
         private readonly IApplicationSettings _applicationSettings;
         
