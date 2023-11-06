@@ -13,9 +13,8 @@ namespace Implementation.IO
             return result;
         }
 
-        public IEnumerable<T> TryParse<T>(string input, IDataParser.TryParseHandler<T> handler, out bool isOkay, char separator, params char[] separators)
+        public IEnumerable<T> TryParse<T>(string input, IDataParser.TryParseHandler<T> handler, char separator, params char[] separators)
         {
-            isOkay = false;
             separators = new[]
             {
                 separator
@@ -27,7 +26,7 @@ namespace Implementation.IO
             var convertedLines = new List<T>();
             foreach (var line in lines)
             {
-                isOkay = handler(line, out var result);
+                var isOkay = handler(line, out var result);
                 if (isOkay)
                 {
                     convertedLines.Add(result);
@@ -37,18 +36,11 @@ namespace Implementation.IO
             return convertedLines;
         }
         
-        public IEnumerable<IEnumerable<T>> MultiTryParse<T>(string input, IDataParser.TryParseHandler<T> handler, out bool isOkay, char separator, params char[] separators)
+        public IEnumerable<IEnumerable<T>> MultiTryParse<T>(string input, IDataParser.TryParseHandler<T> handler, char separator, params char[] separators)
         {
-            isOkay = false;
-            var convertedLines = new List<IEnumerable<T>>();
             var lines = input.Split(Environment.NewLine);
 
-            foreach (var line in lines)
-            {
-                convertedLines.Add(TryParse(line, handler, out isOkay, separator, separators));
-            }
-            
-            return convertedLines;
+            return lines.Select(line => TryParse(line, handler, separator, separators)).ToList();
         }
     }
 }

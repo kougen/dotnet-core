@@ -1,10 +1,13 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
+using GameFramework.Impl.Time;
 using Implementation.Application;
 using Implementation.Configuration.Factories;
 using Implementation.IO;
 using Implementation.Navigator.Factories;
 using Implementation.Repositories.Factories;
+using Implementation.Time.Factories;
 using Infrastructure.Application;
 using Infrastructure.Configuration.Factories;
 using Infrastructure.IO;
@@ -12,14 +15,17 @@ using Infrastructure.Logger;
 using Infrastructure.Module;
 using Infrastructure.Navigator.Factories;
 using Infrastructure.Repositories.Factories;
+using Infrastructure.Time;
+using Infrastructure.Time.Factories;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Implementation.Module
 {
     public class CoreModule : IGeneralModule
     {
-        public void LoadModules(IServiceCollection collection, string projectNamespace)
+        public void RegisterServices(IServiceCollection collection, string projectNamespace)
         {
+            var tokenSource = new CancellationTokenSource();
             var mainFolder = Path.Join("joshika39", projectNamespace);
             var userFolder = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), mainFolder);
             collection.AddScoped<ILogger, Logger.Logger>(_ => new Logger.Logger(Guid.NewGuid()));
@@ -30,9 +36,14 @@ namespace Implementation.Module
             collection.AddScoped<IReader, Reader>();
             collection.AddScoped<IDataParser, DefaultDataParser>();
             collection.AddTransient<IRepositoryFactory, RepositoryFactory>();
-            collection.AddTransient<IApplicationSettings, GeneralApplicationSettings>(provider => 
-                new GeneralApplicationSettings(userFolder, provider.GetRequiredService<IConfigurationQueryFactory>())
-            );
+
+            collection.AddScoped<ILifeCycleManager>(_ => new LifeCycleManager(tokenSource));
+            collection.AddSingleton<IStopWatchFactory, StopwatchFactory>();
+            collection.AddScoped<IStopwatch>(_ => new DefaultStopwatch(tokenSource.Token));
+
+            collection.AddTransient<IApplicationSettings, GeneralApplicationSettings>(provider =>
+                    new GeneralApplicationSettings(userFolder, provider.GetRequiredService<IConfigurationQueryFactory>())
+                );
         }
     }
 }

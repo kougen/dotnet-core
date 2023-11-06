@@ -3,94 +3,86 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Implementation.Converters;
 using Infrastructure.Application;
 using Infrastructure.Repositories;
 using Newtonsoft.Json;
 
 namespace Implementation.Repositories
 {
-    public abstract class AJsonRepository<TInterface, TClass> : IRepository<TInterface> 
-        where TInterface : class, IEntity
-        where TClass : class, TInterface
+    /// <summary>
+    /// Abstract Json implementation of the <see cref="IRepository{T}"/>.
+    /// </summary>
+    /// <typeparam name="TClass"></typeparam>
+    public abstract class AJsonRepository<TClass> : IRepository<TClass> where TClass : class, IEntity
     {
         private readonly string _dataPath;
         private readonly string _filePath;
-        private readonly IList<TInterface> _updatedEntities;
-        private readonly IList<TInterface> _addedEntities;
+        private readonly IList<TClass> _updatedEntities;
+        private readonly IList<TClass> _addedEntities;
         private readonly IList<Guid> _removedEntities;
         private bool _isLocked;
-        private readonly JsonSerializerSettings _settings;
 
         protected AJsonRepository(IApplicationSettings applicationSettings, string repositoryKey)
         {
             applicationSettings = applicationSettings ?? throw new ArgumentNullException(nameof(applicationSettings));
             repositoryKey = repositoryKey ?? throw new ArgumentNullException(nameof(repositoryKey));
 
-            _updatedEntities = new List<TInterface>();
-            _addedEntities = new List<TInterface>();
+            _updatedEntities = new List<TClass>();
+            _addedEntities = new List<TClass>();
             _removedEntities = new List<Guid>();
             _dataPath = applicationSettings.RepositoryPath!;
             _filePath = Path.Join(_dataPath, $"{repositoryKey}.json");
-            _settings = new JsonSerializerSettings()
-            {
-                Converters = new List<JsonConverter>
-                {
-                    new GenericJsonConverter<TInterface, TClass>()
-                }
-            };
         }
 
-        public async Task<IEnumerable<TInterface>> GetAllEntitiesAsync()
+        public async Task<IEnumerable<TClass>> GetAllEntitiesAsync()
         {
             return await GetAllContentAsync();
         }
-        public IEnumerable<TInterface> GetAllEntities()
+        public IEnumerable<TClass> GetAllEntities()
         {
             return GetAllContent();
         }
-        public async Task<TInterface?> GetEntityAsync(Guid id)
+        public async Task<TClass?> GetEntityAsync(Guid id)
         {
             var allContent = await GetAllContentAsync();
             return allContent.FirstOrDefault(e => e.Id.Equals(id));
             
         }
 
-        public TInterface? GetEntity(Guid id)
+        public TClass? GetEntity(Guid id)
         {
             var allContent = GetAllContent();
             return allContent.FirstOrDefault(e => e.Id.Equals(id));
         }
-        public IRepository<TInterface> Create(TInterface entity)
+        public IRepository<TClass> Create(TClass entity)
         {
             _addedEntities.Add(entity);
             return this;
         }
-        public IRepository<TInterface> Delete(Guid id)
+        public IRepository<TClass> Delete(Guid id)
         {
             _removedEntities.Add(id);
             return this;
         }
-        public IRepository<TInterface> Update(TInterface entity)
+        public IRepository<TClass> Update(TClass entity)
         {
             _updatedEntities.Add(entity);
             return this;
         }
        
-        public IRepository<TInterface> SaveChanges()
+        public void SaveChanges()
         {
             if (_isLocked)
             {
-                return this;
+                return;
             }
             
             CreateRepository();
             _isLocked = true;
             
-            var newContent = JsonConvert.SerializeObject(PerformSave(GetAllContent().ToList()), _settings);
+            var newContent = JsonConvert.SerializeObject(PerformSave(GetAllContent().ToList()));
             File.WriteAllText(_filePath, newContent);
             _isLocked = false;
-            return this;
         }
 
         private async Task CreateRepositoryAsync()
@@ -121,38 +113,37 @@ namespace Implementation.Repositories
             }
         }
 
-        private async Task<IEnumerable<TInterface>> GetAllContentAsync()
+        private async Task<IEnumerable<TClass>> GetAllContentAsync()
         {
             await SaveChangesAsync();
             var allContent = await File.ReadAllTextAsync(_filePath);
-            var list = await Task.Factory.StartNew(() => JsonConvert.DeserializeObject<IEnumerable<TInterface>>(allContent, _settings));
-            return list ?? new List<TInterface>();
+            var list = await Task.Factory.StartNew(() => JsonConvert.DeserializeObject<IEnumerable<TClass>>(allContent));
+            return list ?? new List<TClass>();
         }
         
-        private IEnumerable<TInterface> GetAllContent()
+        private IEnumerable<TClass> GetAllContent()
         {
             SaveChanges();
             var allContent = File.ReadAllText(_filePath);
-            var list = JsonConvert.DeserializeObject<IEnumerable<TInterface>>(allContent, _settings);
-            return list ?? new List<TInterface>();
+            var list = JsonConvert.DeserializeObject<IEnumerable<TClass>>(allContent);
+            return list ?? new List<TClass>();
         }
 
-        public async Task<IRepository<TInterface>> SaveChangesAsync()
+        public async Task SaveChangesAsync()
         {
             if (_isLocked)
             {
-                return this;
+                return;
             }
             await CreateRepositoryAsync();
             _isLocked = true;
             var currentContent = PerformSave((await GetAllContentAsync()).ToList());
-            var newContent = await Task.Factory.StartNew(() => JsonConvert.SerializeObject(currentContent, _settings));
+            var newContent = await Task.Factory.StartNew(() => JsonConvert.SerializeObject(currentContent));
             await File.WriteAllTextAsync(_filePath, newContent);
             _isLocked = false;
-            return await Task.FromResult<IRepository<TInterface>>(this);
         }
 
-        private ICollection<TInterface> PerformSave(ICollection<TInterface> currentContent)
+        private ICollection<TClass> PerformSave(ICollection<TClass> currentContent)
         {
             for (var index = 0; index < _addedEntities.Count; index++)
             {

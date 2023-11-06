@@ -9,7 +9,7 @@ namespace ManualTests
         public IServiceProvider LoadModules()
         {
             var collection = new ServiceCollection();
-            new CoreModule().LoadModules(collection, "ManualTests");
+            new CoreModule().RegisterServices(collection, "ManualTests");
             return collection.BuildServiceProvider();
         }
     }

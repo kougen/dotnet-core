@@ -17,7 +17,7 @@ namespace ImplementationTest
         public ReaderTests()
         {
             var collection = new ServiceCollection();
-            new CoreModule().LoadModules(collection, "reader-tests");
+            new CoreModule().RegisterServices(collection, "reader-tests");
             _provider = collection.BuildServiceProvider();
         }
 
