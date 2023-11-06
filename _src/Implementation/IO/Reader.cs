@@ -21,8 +21,7 @@ namespace Implementation.IO
             _dataParser = dataParser ?? throw new ArgumentNullException(nameof(dataParser));
         }
 
-        public IEnumerable<T> ReadLine<T>(StreamReader streamReader, IDataParser.TryParseHandler<T> handler,
-            out bool isOkay, char separator, params char[] separators)
+        public IEnumerable<T> ReadLine<T>(StreamReader streamReader, IDataParser.TryParseHandler<T> handler, char separator, params char[] separators)
         {
             Console.SetIn(streamReader);
 
@@ -32,7 +31,7 @@ namespace Implementation.IO
                 _logger.LogWrite($"{rawInput}\n");
             }
             
-            return _dataParser.TryParse(rawInput, handler, out isOkay, separator, separators);
+            return _dataParser.TryParse(rawInput, handler, separator, separators);
         }
         
         public T? ReadLine<T>(StreamReader streamReader, IDataParser.TryParseHandler<T> handler, out bool isOkay)
@@ -63,8 +62,7 @@ namespace Implementation.IO
             var reader = new StreamReader(Console.OpenStandardInput());
             var time = DateTime.Now.ToString("HH:mm:ss");
             _writer.Write(Constants.EscapeColors.CYAN, $"[  INPUT: {time}] {prompt}");
-            var ans = ReadLine(reader, handler, out _, separator, separators);
-            return ans;
+            return ReadLine(reader, handler, separator, separators);
         }
 
         public string ReadLine(string prompt, string errorMsg)
@@ -98,14 +96,7 @@ namespace Implementation.IO
             {
                 var time = DateTime.Now.ToString("HH:mm:ss");
                 _writer.Write(Constants.EscapeColors.CYAN, $"[  INPUT: {time}] {prompt}");
-                var ans = ReadLine(reader, handler, out var isCorrect, separator, separators);
-
-                if (isCorrect)
-                {
-                    return ans;
-                }
-
-                _writer.WriteLine(MessageSeverity.Error, $"{errorMsg} | (Invalid type: {typeof(T)})!");
+                return ReadLine(reader, handler, separator, separators);
             }
         }
 
@@ -119,12 +110,6 @@ namespace Implementation.IO
         {
             var reader = new StreamReader(Console.OpenStandardInput());
             return ReadLine(reader, handler, separator, separators);
-        }
-
-        public IEnumerable<T> ReadLine<T>(StreamReader streamReader, IDataParser.TryParseHandler<T> handler,
-            char separator, params char[] separators)
-        {
-            return ReadLine(streamReader, handler, out _, separator, separators);
         }
 
         public string ReadAllLines(string prompt)

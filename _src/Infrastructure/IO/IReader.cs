@@ -12,7 +12,6 @@ namespace Infrastructure.IO
         /// </summary>
         /// <param name="streamReader"></param>
         /// <param name="handler">A type parser method</param>
-        /// <param name="isOkay"></param>
         /// <param name="separator"></param>
         /// <param name="separators"></param>
         /// <example>
@@ -23,7 +22,7 @@ namespace Infrastructure.IO
         /// <seealso cref="Console.ReadLine()"/>
         /// <returns>The converted Type passed with the type parameter.</returns>
         /// <exception cref="InvalidOperationException">Exception being thrown when the conversion is unsuccessful.</exception>
-        IEnumerable<T> ReadLine<T>(StreamReader streamReader, IDataParser.TryParseHandler<T> handler, out bool isOkay, char separator, params char[] separators);
+        IEnumerable<T> ReadLine<T>(StreamReader streamReader, IDataParser.TryParseHandler<T> handler, char separator, params char[] separators);
         T? ReadLine<T>(StreamReader streamReader, IDataParser.TryParseHandler<T> handler, out bool isOkay);
         
         #region ReadLine
@@ -36,7 +35,6 @@ namespace Infrastructure.IO
         
         T? ReadLine<T>(IDataParser.TryParseHandler<T> handler, out bool isOkay);
         IEnumerable<T> ReadLine<T>(IDataParser.TryParseHandler<T> handler, char separator, params char[] separators);
-        IEnumerable<T> ReadLine<T>(StreamReader streamReader, IDataParser.TryParseHandler<T> handler, char separator, params char[] separators);
         #endregion
         
         #region ReadAllLines
