@@ -2,12 +2,10 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Implementation.Module;
 using Implementation.Repositories.Factories;
 using ImplementationTest.RepositoryTests.Model;
 using Infrastructure.Application;
 using Infrastructure.Repositories.Factories;
-using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Xunit;
 
@@ -23,7 +21,7 @@ namespace ImplementationTest.RepositoryTests
             var fileName = $@".\data\users-{id}.json";
             try
             {
-                await using var repository = CreateRepositoryFactory(@".\data").CreateJsonRepository<IUser, User>($"users-{id}");
+                await using var repository = CreateRepositoryFactory(@".\data").CreateRepository<User>($"users-{id}");
                 await repository.SaveChangesAsync();
                 Assert.True(File.Exists(fileName));
                 var text = await File.ReadAllTextAsync(fileName);
@@ -46,7 +44,7 @@ namespace ImplementationTest.RepositoryTests
             
             try
             {
-                await using var repository = CreateRepositoryFactory(@".\data").CreateJsonRepository<IUser, User>($"users-{id}");
+                await using var repository = CreateRepositoryFactory(@".\data").CreateRepository<User>($"users-{id}");
                 var user = new User
                 {
                     Name = "Peter",
@@ -75,7 +73,7 @@ namespace ImplementationTest.RepositoryTests
             
             try
             {
-                using var repository = CreateRepositoryFactory(@".\data").CreateJsonRepository<IUser, User>($"users-{id}");
+                using var repository = CreateRepositoryFactory(@".\data").CreateRepository<User>($"users-{id}");
                 var user = new User()
                 {
                     Name = "Peter",
@@ -101,7 +99,7 @@ namespace ImplementationTest.RepositoryTests
         public void JRT_0021_Given_JsonFile_When_GetAllEntitiesCalled_Then_AllEntitiesReturns()
         {
             var fileName = @".\Resources\JRT\0021-users.json";
-            using var repository = CreateRepositoryFactory(@".\Resources\JRT").CreateJsonRepository<IUser, User>("0021-users");
+            using var repository = CreateRepositoryFactory(@".\Resources\JRT").CreateRepository<User>("0021-users");
             var allUsers = repository.GetAllEntities().ToList();
             var guid = Guid.Parse("061e971d-5ca2-4b9f-998f-66766b06c4ce");
             Assert.True(File.Exists(fileName));
@@ -113,7 +111,7 @@ namespace ImplementationTest.RepositoryTests
         public async Task JRT_0022_Given_JsonFile_When_GetAllEntitiesAsyncCalled_Then_AllEntitiesReturns()
         {
             var fileName = @".\Resources\JRT\0021-users.json";
-            await using var repository = CreateRepositoryFactory(@".\Resources\JRT").CreateJsonRepository<IUser, User>("0021-users");
+            await using var repository = CreateRepositoryFactory(@".\Resources\JRT").CreateRepository<User>("0021-users");
             var allUsers = (await repository.GetAllEntitiesAsync()).ToList();
             var guid = Guid.Parse("061e971d-5ca2-4b9f-998f-66766b06c4ce");
             Assert.True(File.Exists(fileName));
@@ -128,7 +126,7 @@ namespace ImplementationTest.RepositoryTests
             var fileName = @".\Resources\JRT\0021-users.json";
             var tempFileName = @$".\Resources\JRT\{id}.json";
             File.Copy(fileName, tempFileName);
-            using var repository = CreateRepositoryFactory(@".\Resources\JRT").CreateJsonRepository<IUser, User>(id.ToString());
+            using var repository = CreateRepositoryFactory(@".\Resources\JRT").CreateRepository<User>(id.ToString());
             var fistUser = repository.GetAllEntities().First();
             repository.Delete(fistUser.Id).SaveChanges();
             Assert.True(File.Exists(tempFileName));

@@ -23,7 +23,7 @@ namespace Implementation.Module
 {
     public class CoreModule : IGeneralModule
     {
-        public void LoadModules(IServiceCollection collection, string projectNamespace)
+        public void RegisterServices(IServiceCollection collection, string projectNamespace)
         {
             var tokenSource = new CancellationTokenSource();
             var mainFolder = Path.Join("joshika39", projectNamespace);

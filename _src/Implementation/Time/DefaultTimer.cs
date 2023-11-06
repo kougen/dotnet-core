@@ -1,10 +1,8 @@
 using System;
-using System.Diagnostics;
-using GameFramework.Time;
 using Infrastructure.Time;
 using Infrastructure.Time.Listeners;
 
-namespace GameFramework.Impl.Time
+namespace Implementation.Time
 {
     internal class DefaultTimer : ITimer
     {
