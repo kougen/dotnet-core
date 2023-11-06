@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
-using GameFramework.Impl.Time;
 using Implementation.Application;
 using Implementation.Configuration.Factories;
 using Implementation.IO;
@@ -21,8 +20,15 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Implementation.Module
 {
-    public class CoreModule : IGeneralModule
+    public class CoreModule : IGeneralModule, ICancellableModule
     {
+        public CancellationTokenSource Source { get; }
+
+        public CoreModule()
+        {
+            
+        }
+        
         public void RegisterServices(IServiceCollection collection, string projectNamespace)
         {
             var tokenSource = new CancellationTokenSource();
