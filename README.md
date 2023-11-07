@@ -1,3 +1,5 @@
+![Project Banner](banner.png)
+
 # C# Tools Library
 
 `joshika39.Core` meant to enhance the basic C# functionalities, like the `Console.Readline` or storing data in `json` format. The project is actively being updated. If you have any enchantment idea create an [Enhancement Issue](https://github.com/joshika39/cs-tools/issues/new?assignees=&labels=enhancement&projects=&template=enhancement.md&title=New+Enhancement+name) or a [Bug](https://github.com/joshika39/cs-tools/issues/new?assignees=&labels=bug&projects=&template=bug.md&title=) on that matter.
