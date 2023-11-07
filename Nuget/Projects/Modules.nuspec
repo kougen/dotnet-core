@@ -3,8 +3,12 @@
 	<metadata>
 		<id>joshika39.Core</id>
 		<version>1.0.0.0-pre0001</version>
-		<description>Improved .net core functionality. </description>
+		<description>Improved .net core functionality.</description>
 		<authors>joshika39</authors>
+		<icon>images\logo.png</icon>
+		<projectUrl>https://github.com/joshika39/cs-tools</projectUrl>
+		<license type="expression">MIT</license>
+		<readme>docs\README.md</readme>
 		<dependencies>
 			<group targetFramework="net6.0">
 				<dependency id="Microsoft.Extensions.DependencyInjection" version="7.0.0" />
@@ -15,5 +19,7 @@
 
 	<files>
 		<file src="..\..\Binaries\{CONFIGURATION}\net6.0\joshika39.*.dll" target="lib\net6.0" />
+		<file src="..\..\README.md" target="docs\" />
+		<file src="..\..\logo.png" target="images\" />
 	</files>
 </package>
