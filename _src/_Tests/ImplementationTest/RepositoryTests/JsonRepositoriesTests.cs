@@ -18,10 +18,10 @@ namespace ImplementationTest.RepositoryTests
         public async Task JRT_0001_Given_InExistentJsonRepository_When_ConstructorCalled_Then_EmptyRepoIsCreated()
         {
             var id = Guid.NewGuid();
-            var fileName = $@".\data\users-{id}.json";
+            var fileName = Path.Join(".", "data", $"users-{id}.json");
             try
             {
-                await using var repository = CreateRepositoryFactory(@".\data").CreateRepository<User>($"users-{id}");
+                await using var repository = CreateRepositoryFactory(Path.Join(".", "data")).CreateRepository<User>($"users-{id}");
                 await repository.SaveChangesAsync();
                 Assert.True(File.Exists(fileName));
                 var text = await File.ReadAllTextAsync(fileName);
@@ -40,11 +40,11 @@ namespace ImplementationTest.RepositoryTests
         public async Task JRT_0011_Given_EmptyRepository_When_CreateEntityCalled_Then_EntityCreated()
         {
             var id = Guid.NewGuid();
-            var fileName = $@".\data\users-{id}.json";
+            var fileName = Path.Join(".", "data", $"users-{id}.json");
             
             try
             {
-                await using var repository = CreateRepositoryFactory(@".\data").CreateRepository<User>($"users-{id}");
+                await using var repository = CreateRepositoryFactory(Path.Join(".", "data")).CreateRepository<User>($"users-{id}");
                 var user = new User
                 {
                     Name = "Peter",
@@ -58,7 +58,7 @@ namespace ImplementationTest.RepositoryTests
             }
             finally
             {
-                if (File.Exists($@".\data\users-{id}.json"))
+                if (File.Exists(Path.Join(".", "data", $"users-{id}.json")))
                 {
                     File.Delete(fileName);
                 }
@@ -69,11 +69,11 @@ namespace ImplementationTest.RepositoryTests
         public void JRT_0012_Given_EmptyRepository_When_CreateEntityCalledSynchronously_Then_EntityCreated()
         {
             var id = Guid.NewGuid();
-            var fileName = $@".\data\users-{id}.json";
+            var fileName = Path.Join(".", "data", $"users-{id}.json");
             
             try
             {
-                using var repository = CreateRepositoryFactory(@".\data").CreateRepository<User>($"users-{id}");
+                using var repository = CreateRepositoryFactory(Path.Join(".", "data")).CreateRepository<User>($"users-{id}");
                 var user = new User()
                 {
                     Name = "Peter",
@@ -88,7 +88,7 @@ namespace ImplementationTest.RepositoryTests
             }
             finally
             {
-                if (File.Exists($@".\data\users-{id}.json"))
+                if (File.Exists(Path.Join(".", "data", $"users-{id}.json")))
                 {
                     File.Delete(fileName);
                 }
@@ -98,8 +98,8 @@ namespace ImplementationTest.RepositoryTests
         [Fact]
         public void JRT_0021_Given_JsonFile_When_GetAllEntitiesCalled_Then_AllEntitiesReturns()
         {
-            var fileName = @".\Resources\JRT\0021-users.json";
-            using var repository = CreateRepositoryFactory(@".\Resources\JRT").CreateRepository<User>("0021-users");
+            var fileName = Path.Join(".", "Resources", "JRT", "0021-users.json");
+            using var repository = CreateRepositoryFactory(Path.Join(".", "Resources", "JRT")).CreateRepository<User>("0021-users");
             var allUsers = repository.GetAllEntities().ToList();
             var guid = Guid.Parse("061e971d-5ca2-4b9f-998f-66766b06c4ce");
             Assert.True(File.Exists(fileName));
@@ -110,8 +110,8 @@ namespace ImplementationTest.RepositoryTests
         [Fact]
         public async Task JRT_0022_Given_JsonFile_When_GetAllEntitiesAsyncCalled_Then_AllEntitiesReturns()
         {
-            var fileName = @".\Resources\JRT\0021-users.json";
-            await using var repository = CreateRepositoryFactory(@".\Resources\JRT").CreateRepository<User>("0021-users");
+            var fileName = Path.Join(".", "Resources", "JRT", "0021-users.json");
+            await using var repository = CreateRepositoryFactory(Path.Join(".", "Resources", "JRT")).CreateRepository<User>("0021-users");
             var allUsers = (await repository.GetAllEntitiesAsync()).ToList();
             var guid = Guid.Parse("061e971d-5ca2-4b9f-998f-66766b06c4ce");
             Assert.True(File.Exists(fileName));
@@ -123,10 +123,10 @@ namespace ImplementationTest.RepositoryTests
         public void JRT_0031_Given_JsonFile_When_DeleteFirstFromRepository_Then_EntityIsDeleted()
         {
             var id = Guid.NewGuid();
-            var fileName = @".\Resources\JRT\0021-users.json";
-            var tempFileName = @$".\Resources\JRT\{id}.json";
+            var fileName = Path.Join(".", "Resources", "JRT", "0021-users.json");
+            var tempFileName = Path.Join(".", "Resources", "JRT", $"{id}.json");
             File.Copy(fileName, tempFileName);
-            using var repository = CreateRepositoryFactory(@".\Resources\JRT").CreateRepository<User>(id.ToString());
+            using var repository = CreateRepositoryFactory(Path.Join(".", "Resources", "JRT")).CreateRepository<User>(id.ToString());
             var fistUser = repository.GetAllEntities().First();
             repository.Delete(fistUser.Id).SaveChanges();
             Assert.True(File.Exists(tempFileName));

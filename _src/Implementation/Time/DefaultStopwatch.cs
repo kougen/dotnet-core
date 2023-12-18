@@ -4,7 +4,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Implementation.Time.Factories;
 using Infrastructure.Time;
+using Infrastructure.Time.Factories;
 using Infrastructure.Time.Listeners;
 
 namespace Implementation.Time
@@ -13,7 +15,7 @@ namespace Implementation.Time
     {
         private readonly CancellationToken _cancellationToken;
         private readonly Stopwatch _stopwatch;
-        private readonly ICollection<PeriodicStopwatch> _periodicStopwatches;
+        private readonly ICollection<IPeriodicStopwatch> _periodicStopwatches;
         private bool _disposed;
         private readonly ICollection<ITickListener> _listeners;
         
@@ -23,7 +25,7 @@ namespace Implementation.Time
         public DefaultStopwatch(CancellationToken cancellationToken)
         {
             _cancellationToken = cancellationToken;
-            _periodicStopwatches = new List<PeriodicStopwatch>();
+            _periodicStopwatches = new List<IPeriodicStopwatch>();
             _stopwatch = new Stopwatch();
             _listeners = new List<ITickListener>();
         }
@@ -57,7 +59,7 @@ namespace Implementation.Time
                 {
                     if (Elapsed.TotalMilliseconds > startedTime.TotalMilliseconds + periodInMilliseconds)
                     {
-                        listener.RaiseTick(0);
+                        listener.RaiseTick(-1);
                         break;
                     }
                 }
@@ -102,14 +104,43 @@ namespace Implementation.Time
                 periodicStopwatch.Reset();
             }
         }
-        
+
         public void PeriodicOperation(int periodInMilliseconds, ITickListener listener, CancellationToken cancellationToken)
         {
-            var periodicStopwatch = new PeriodicStopwatch(periodInMilliseconds, listener, cancellationToken);
+            var periodicStopwatch = new PeriodicStopwatch(this, periodInMilliseconds, listener, cancellationToken);
             _periodicStopwatches.Add(periodicStopwatch);
             periodicStopwatch.Start();
         }
+
+        public IPeriodicStopwatchFactory GetPeriodicStopwatchFactory()
+        {
+            return new PeriodicStopwatchFactory(this, _cancellationToken);
+        }
         
+        public void UnregisterStopwatch(IPeriodicStopwatch stopwatch)
+        {
+            if (_periodicStopwatches.Contains(stopwatch))
+            {
+                _periodicStopwatches.Remove(stopwatch);
+            }
+        }
+
+        public void RegisterStopwatch(IPeriodicStopwatch stopwatch)
+        {
+            if (!_periodicStopwatches.Contains(stopwatch))
+            {
+                _periodicStopwatches.Add(stopwatch);
+            }
+        }
+
+        public IPeriodicStopwatch PeriodicOperation(int periodInMilliseconds, CancellationToken cancellationToken)
+        {
+            var periodicStopwatch = new PeriodicStopwatch(this, periodInMilliseconds, cancellationToken);
+            _periodicStopwatches.Add(periodicStopwatch);
+            periodicStopwatch.Start();
+            return periodicStopwatch;
+        }
+
         public void AttachListener(ITickListener listener)
         {
             _listeners.Add(listener);
@@ -128,6 +159,7 @@ namespace Implementation.Time
                 {
                     var stopwatch = _periodicStopwatches.First();
                     _periodicStopwatches.Remove(stopwatch);
+                    stopwatch.Dispose();
                 }
 
                 while (_listeners.Any())

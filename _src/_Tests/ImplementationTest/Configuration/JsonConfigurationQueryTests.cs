@@ -1,3 +1,4 @@
+using System.IO;
 using System.Threading.Tasks;
 using Implementation.Configuration;
 using ImplementationTest.Configuration.Model;
@@ -10,7 +11,7 @@ namespace ImplementationTest.Configuration
         [Fact]
         public async Task JCQT_0001()
         {
-            var filePath = @".\Resources\JCQT\0001.json";
+            var filePath = Path.Join(".", "Resources", "JCQT", "0001.json");
 
             var jsonService = new JsonConfigurationQuery(filePath);
 
@@ -20,7 +21,7 @@ namespace ImplementationTest.Configuration
         [Fact]
         public async Task JCQT_0002()
         {
-            var filePath = @".\Resources\JCQT\0001.json";
+            var filePath = Path.Join(".", "Resources", "JCQT", "0001.json");
 
             var jsonService = new JsonConfigurationQuery(filePath);
 
@@ -30,7 +31,7 @@ namespace ImplementationTest.Configuration
         [Fact]
         public async Task JCQT_0003()
         {
-            var filePath = @".\Resources\JCQT\0001.json";
+            var filePath = Path.Join(".", "Resources", "JCQT", "0001.json");
 
             var jsonService = new JsonConfigurationQuery(filePath);
 
@@ -40,7 +41,7 @@ namespace ImplementationTest.Configuration
         [Fact]
         public async Task JCQT_0004()
         {
-            var filePath = @".\Resources\JCQT\0001.json";
+            var filePath = Path.Join(".", "Resources", "JCQT", "0001.json");
 
             var jsonService = new JsonConfigurationQuery(filePath);
 
@@ -50,9 +51,9 @@ namespace ImplementationTest.Configuration
         [Fact]
         public async Task JCQT_0005()
         {
-            const string FILE_PATH = @".\Resources\JCQT\0001.json";
+            var filePath = Path.Join(".", "Resources", "JCQT", "0001.json");
 
-            var jsonService = new JsonConfigurationQuery(FILE_PATH);
+            var jsonService = new JsonConfigurationQuery(filePath);
 
             var admin = await jsonService.GetObjectAsync<Admin>("server.admin");
             admin.Name = "Kayaba Akihiko";

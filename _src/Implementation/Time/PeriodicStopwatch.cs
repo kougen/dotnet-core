@@ -11,23 +11,42 @@ namespace Implementation.Time
     internal class PeriodicStopwatch : IPeriodicStopwatch
     {
         private readonly Stopwatch _stopwatch;
+        private readonly IStopwatch _parent;
         private int _periodInMilliseconds;
         private readonly CancellationToken _cancellationToken;
         private int _round;
-        public TimeSpan Elapsed { get; private set; }
         private readonly ICollection<ITickListener> _listeners;
 
-        public PeriodicStopwatch(int periodInMilliseconds, ITickListener listener, CancellationToken cancellationToken)
+        public bool IsRunning => _parent.IsRunning;
+        
+        public TimeSpan Elapsed { get; private set; }
+
+        public PeriodicStopwatch(IStopwatch parent, int periodInMilliseconds, ITickListener listener, CancellationToken cancellationToken)
         {
+            _parent = parent ?? throw new ArgumentNullException(nameof(parent));
             _periodInMilliseconds = periodInMilliseconds;
             _cancellationToken = cancellationToken;
             _stopwatch = new Stopwatch();
             _listeners = new List<ITickListener>();
             _listeners.Add(listener);
         }
+        
+        public PeriodicStopwatch(IStopwatch parent, int periodInMilliseconds, CancellationToken cancellationToken)
+        {
+            _periodInMilliseconds = periodInMilliseconds;
+            _cancellationToken = cancellationToken;
+            _parent = parent ?? throw new ArgumentNullException(nameof(parent));
+            _stopwatch = new Stopwatch();
+            _listeners = new List<ITickListener>();
+        }
 
         public void Start()
         {
+            if (!_parent.IsRunning)
+            {
+                throw new InvalidOperationException("Parent stopwatch is not running");
+            }
+            
             _stopwatch.Start();
             Task.Run(() =>
             {
@@ -38,6 +57,7 @@ namespace Implementation.Time
                         foreach (var listener in _listeners)
                         {
                             listener.RaiseTick(_round);
+                            listener.ElapsedTime = Elapsed;
                         }
                         Elapsed += _stopwatch.Elapsed;
                         _stopwatch.Restart();
@@ -75,6 +95,15 @@ namespace Implementation.Time
         public void AttachListener(ITickListener listener)
         {
             _listeners.Add(listener);
+        }
+
+        public void Dispose()
+        {
+            _stopwatch.Stop();
+            _stopwatch.Reset();
+            _listeners.Clear();
+            _parent.UnregisterStopwatch(this);
+            GC.SuppressFinalize(this);
         }
     }
 }

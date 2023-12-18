@@ -22,11 +22,31 @@ namespace ImplementationTest
             _provider = collection.BuildServiceProvider();
         }
 
+        public static IEnumerable<object[]> RT_0001_MemberData()
+        {
+            yield return new object[]
+            {
+                GetResourcePath("0001_0.txt"),
+                0
+            };
+            yield return new object[]
+            {
+                GetResourcePath("0001_1.txt"),
+                1
+            };
+            yield return new object[]
+            {
+                GetResourcePath("0001_2.txt"),
+                2
+            };
+            yield return new object[]
+            {
+                GetResourcePath("0001_3.txt"),
+                3
+            };
+        }
         [Theory]
-        [InlineData(@"Resources\RT\0001_0.txt", 0)]
-        [InlineData(@"Resources\RT\0001_1.txt", 1)]
-        [InlineData(@"Resources\RT\0001_2.txt", 2)]
-        [InlineData(@"Resources\RT\0001_3.txt", 3)]
+        [MemberData(nameof(RT_0001_MemberData))]
         public void RT_0001_Given_FileWithValidData_When_ReadLineWithSingleValue_Then_ReturnsCorrectValue(string path,
             int expected)
         {
@@ -45,7 +65,7 @@ namespace ImplementationTest
         {
             yield return new object[]
             {
-                @"Resources\RT\0002_0.txt",
+                GetResourcePath("0002_0.txt"),
                 new List<int>
                 {
                     0,
@@ -57,7 +77,7 @@ namespace ImplementationTest
             };
             yield return new object[]
             {
-                @"Resources\RT\0002_1.txt",
+                GetResourcePath("0002_1.txt"),
                 new List<int>
                 {
                     4,
@@ -89,7 +109,7 @@ namespace ImplementationTest
             using (var scope = _provider.CreateScope())
             {
                 var reader = scope.ServiceProvider.GetRequiredService<IReader>();
-                using var stream = new StreamReader(@"Resources\RT\readlineTest.txt");
+                using var stream = new StreamReader(GetResourcePath("readlineTest.txt"));
                 const string contents = "test String";
 
                 var result = Reader.ReadLine(stream, out _);
@@ -102,7 +122,7 @@ namespace ImplementationTest
         {
             yield return new object[]
             {
-                @"Resources\RT\0031_0.txt",
+                GetResourcePath("0031_0.txt"),
                 new List<int>
                 {
                     1,
@@ -112,7 +132,7 @@ namespace ImplementationTest
             };
             yield return new object[]
             {
-                @"Resources\RT\0031_1.txt",
+                GetResourcePath("0031_1.txt"),
                 new List<int>
                 {
                     4,
@@ -142,7 +162,7 @@ namespace ImplementationTest
         {
             yield return new object[]
             {
-                @"Resources\RT\0041_0.txt",
+                GetResourcePath("0041_0.txt"),
                 new List<int>
                 {
                     4,
@@ -153,7 +173,7 @@ namespace ImplementationTest
             };
             yield return new object[]
             {
-                @"Resources\RT\0041_1.txt",
+                GetResourcePath("0041_1.txt"),
                 new List<int>
                 {
                     1,
@@ -181,7 +201,7 @@ namespace ImplementationTest
         {
             yield return new object[]
             {
-                @"Resources\RT\0051_0.txt",
+                GetResourcePath("0051_0.txt"),
                 new List<List<int>>
                 {
                     new()
@@ -201,7 +221,7 @@ namespace ImplementationTest
             };
             yield return new object[]
             {
-                @"Resources\RT\0051_1.txt",
+                GetResourcePath("0051_1.txt"),
                 new List<List<int>>
                 {
                     new()
@@ -247,7 +267,7 @@ namespace ImplementationTest
         {
             yield return new object[]
             {
-                @"Resources\RT\0061_0.txt",
+                GetResourcePath("0061_0.txt"),
                 new List<TestClasses.TestStudent>
                 {
                     new("YQMHWO")
@@ -272,7 +292,7 @@ namespace ImplementationTest
             };
             yield return new object[]
             {
-                @"Resources\RT\0061_1.txt",
+                GetResourcePath("0061_1.txt"),
                 new List<TestClasses.TestStudent>
                 {
                     new("YQMHWO")
@@ -347,6 +367,11 @@ namespace ImplementationTest
                 Assert.True(test);
             }
 
+        }
+        
+        private static string GetResourcePath(string fileName)
+        {
+            return Path.Join(".", "Resources", "RT", fileName);
         }
 
 #pragma warning disable CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()

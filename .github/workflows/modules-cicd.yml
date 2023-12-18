@@ -6,57 +6,6 @@ on:
       - "*v*"
     
 jobs:
-  build:
-    name: Build
-    env:
-      BUILD_CONFIG: 'Debug'
-      SOLUTION: 'Modules.sln'
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-          submodules: recursive
-      - name: 'Get Version'
-        id: get_version
-        uses: battila7/get-version-action@v2
-      - name: Set up JDK 11
-        uses: actions/setup-java@v1
-        with:
-          java-version: 1.11
-      - name: Cache SonarQube packages
-        uses: actions/cache@v1
-        with:
-          path: ~\sonar\cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
-      - name: Cache SonarQube scanner
-        id: cache-sonar-scanner
-        uses: actions/cache@v1
-        with:
-          path: .\.sonar\scanner
-          key: ${{ runner.os }}-sonar-scanner
-          restore-keys: ${{ runner.os }}-sonar-scanner
-      - name: Install SonarQube scanner
-        if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
-        shell: powershell
-        run: |
-          New-Item -Path .\.sonar\scanner -ItemType Directory
-          dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
-      - name: Install dotCover Global
-        shell: powershell
-        run: |
-          dotnet tool install --global JetBrains.dotCover.GlobalTool
-      - name: Build and analyze
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: powershell
-        run: |
-          Write-Output ${{ steps.get_version.outputs.version-without-v }}
-          .\.sonar\scanner\dotnet-sonarscanner begin /k:"${{ secrets.SONAR_PROJECT }}" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="${{ secrets.SONAR_HOST_URL }}" /v:"${{ steps.get_version.outputs.version-without-v }}"
-          dotnet build $env:SOLUTION --configuration $env:BUILD_CONFIG
-          dotnet dotcover test $env:SOLUTION --dcReportType=HTML --dotCoverFilters="-:*Tests;-:testhost"
-          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
   deploy:
     name: 'Build, Test & Deploy'
     env:
@@ -71,9 +20,6 @@ jobs:
       with:
         fetch-depth: 0
         submodules: recursive
-    - name: 'Get Version'
-      id: get_version
-      uses: battila7/get-version-action@v2
 
     - name: Install .NET Core
       uses: actions/setup-dotnet@v3

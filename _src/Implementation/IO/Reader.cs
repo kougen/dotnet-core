@@ -158,9 +158,8 @@ namespace Implementation.IO
                 var readInt = streamReader.Read();
                 var readChar = (char)readInt;
                 sb.Append(readChar);
-                var test1 = LastChars(sb, 2);
-
-
+                var test1 = LastChars(sb, Environment.NewLine.Length);
+                
                 if (!useEndOfFile && test1 == Environment.NewLine)
                 {
                     return sb.ToString();
