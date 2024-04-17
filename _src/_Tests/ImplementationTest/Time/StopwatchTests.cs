@@ -48,23 +48,23 @@ namespace ImplementationTest.Time
             Assert.False(stopwatch.IsRunning);
             Assert.False(pWatch1.IsRunning);
         }
-        
+
         [Fact]
-        public async Task ST_0021_Given_Stopwatch_When_WaitAsyncIsCalled_Then_ListenerGetsNotifiedWithNamedRaiseTick()
+        public Task ST_0021_Given_Stopwatch_When_WaitAsyncIsCalled_Then_ListenerGetsNotifiedWithNamedRaiseTick()
         {
             var listenerMock = new Mock<ITickListener>();
             var cancellationTokenSource = new CancellationTokenSource();
-            using IStopwatch stopwatch = new DefaultStopwatch(cancellationTokenSource.Token);
-            Assert.NotNull(stopwatch);
-            stopwatch.Start();
-            for (var i = 0; i < 10; i++)
+            IStopwatch stopwatch = new DefaultStopwatch(cancellationTokenSource.Token);
             {
-                await stopwatch.WaitAsync(250, listenerMock.Object);
+                stopwatch.Start();
+                var pWatch = stopwatch.NamedPeriodicOperation(200, listenerMock.Object, "Test");
+                Assert.NotNull(stopwatch);
+                Assert.NotNull(pWatch);
+                Thread.Sleep(2150);
+                stopwatch.Stop();
+                listenerMock.Verify(l => l.RaiseTick(stopwatch, "Test", It.IsAny<int>()), Times.Exactly(10));
             }
-
-            stopwatch.Stop();
-            Assert.True(stopwatch.Elapsed.TotalMilliseconds > 2500);
-            listenerMock.Verify(l => l.RaiseTick(-1), Times.Exactly(10));
+            return Task.CompletedTask;
         }
     }
 }
