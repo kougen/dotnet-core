@@ -48,5 +48,23 @@ namespace ImplementationTest.Time
             Assert.False(stopwatch.IsRunning);
             Assert.False(pWatch1.IsRunning);
         }
+
+        [Fact]
+        public Task ST_0021_Given_Stopwatch_When_WaitAsyncIsCalled_Then_ListenerGetsNotifiedWithNamedRaiseTick()
+        {
+            var listenerMock = new Mock<ITickListener>();
+            var cancellationTokenSource = new CancellationTokenSource();
+            IStopwatch stopwatch = new DefaultStopwatch(cancellationTokenSource.Token);
+            {
+                stopwatch.Start();
+                var pWatch = stopwatch.NamedPeriodicOperation(200, listenerMock.Object, "Test");
+                Assert.NotNull(stopwatch);
+                Assert.NotNull(pWatch);
+                Thread.Sleep(2150);
+                stopwatch.Stop();
+                listenerMock.Verify(l => l.RaiseTick(stopwatch, "Test", It.IsAny<int>()), Times.Exactly(10));
+            }
+            return Task.CompletedTask;
+        }
     }
 }

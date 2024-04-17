@@ -11,42 +11,67 @@ namespace Implementation.Time
     internal class PeriodicStopwatch : IPeriodicStopwatch
     {
         private readonly Stopwatch _stopwatch;
-        private readonly IStopwatch _parent;
         private int _periodInMilliseconds;
         private readonly CancellationToken _cancellationToken;
         private int _round;
         private readonly ICollection<ITickListener> _listeners;
 
-        public bool IsRunning => _parent.IsRunning;
-        
+        public bool IsRunning => Parent.IsRunning;
+        public IStopwatch Parent { get; }
+        public string Name { get; }
         public TimeSpan Elapsed { get; private set; }
 
-        public PeriodicStopwatch(IStopwatch parent, int periodInMilliseconds, ITickListener listener, CancellationToken cancellationToken)
+        public PeriodicStopwatch(string name, IStopwatch parent, int periodInMilliseconds, ITickListener listener,
+            CancellationToken cancellationToken)
         {
-            _parent = parent ?? throw new ArgumentNullException(nameof(parent));
+            Parent = parent ?? throw new ArgumentNullException(nameof(parent));
             _periodInMilliseconds = periodInMilliseconds;
             _cancellationToken = cancellationToken;
             _stopwatch = new Stopwatch();
             _listeners = new List<ITickListener>();
             _listeners.Add(listener);
+            Name = name;
+        }
+
+        public PeriodicStopwatch(string name, IStopwatch parent, int periodInMilliseconds, CancellationToken cancellationToken)
+        {
+            _periodInMilliseconds = periodInMilliseconds;
+            _cancellationToken = cancellationToken;
+            Parent = parent ?? throw new ArgumentNullException(nameof(parent));
+            _stopwatch = new Stopwatch();
+            _listeners = new List<ITickListener>();
+            Name = name;
         }
         
         public PeriodicStopwatch(IStopwatch parent, int periodInMilliseconds, CancellationToken cancellationToken)
         {
+            Parent = parent ?? throw new ArgumentNullException(nameof(parent));
             _periodInMilliseconds = periodInMilliseconds;
             _cancellationToken = cancellationToken;
-            _parent = parent ?? throw new ArgumentNullException(nameof(parent));
             _stopwatch = new Stopwatch();
             _listeners = new List<ITickListener>();
+            Name = Guid.NewGuid().ToString();
+        }
+        
+        public PeriodicStopwatch(IStopwatch parent, int periodInMilliseconds, ITickListener listener,
+            CancellationToken cancellationToken)
+        {
+            Parent = parent ?? throw new ArgumentNullException(nameof(parent));
+            _periodInMilliseconds = periodInMilliseconds;
+            _cancellationToken = cancellationToken;
+            _stopwatch = new Stopwatch();
+            _listeners = new List<ITickListener>();
+            _listeners.Add(listener);
+            Name = Guid.NewGuid().ToString();
         }
 
         public void Start()
         {
-            if (!_parent.IsRunning)
+            if (!Parent.IsRunning)
             {
                 throw new InvalidOperationException("Parent stopwatch is not running");
             }
-            
+
             _stopwatch.Start();
             Task.Run(() =>
             {
@@ -57,8 +82,10 @@ namespace Implementation.Time
                         foreach (var listener in _listeners)
                         {
                             listener.RaiseTick(_round);
+                            listener.RaiseTick(Parent, Name, _round);
                             listener.ElapsedTime = Elapsed;
                         }
+
                         Elapsed += _stopwatch.Elapsed;
                         _stopwatch.Restart();
                         _round++;
@@ -102,7 +129,7 @@ namespace Implementation.Time
             _stopwatch.Stop();
             _stopwatch.Reset();
             _listeners.Clear();
-            _parent.UnregisterStopwatch(this);
+            Parent.UnregisterStopwatch(this);
             GC.SuppressFinalize(this);
         }
     }

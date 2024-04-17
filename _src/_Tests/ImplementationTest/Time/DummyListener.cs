@@ -19,6 +19,11 @@ namespace ImplementationTest.Time
             Console.WriteLine($"{Name} -> {round}, time: {ElapsedTime}");
         }
 
+        public void RaiseTick(IStopwatch initiator, string name, int round)
+        {
+            Console.WriteLine($"{Name} -> {round}, time: {ElapsedTime}, initiator: {initiator}, name: {name}");
+        }
+
         public TimeSpan ElapsedTime { get; set; }
     }
 }
