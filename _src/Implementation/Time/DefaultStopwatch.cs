@@ -118,6 +118,20 @@ namespace Implementation.Time
             return PeriodicOperation(periodInMilliseconds, listener, _cancellationToken);
         }
 
+        public IPeriodicStopwatch NamedPeriodicOperation(int periodInMilliseconds, ITickListener listener, string name)
+        {
+            return NamedPeriodicOperation(periodInMilliseconds, listener, name, _cancellationToken);
+        }
+
+        public IPeriodicStopwatch NamedPeriodicOperation(int periodInMilliseconds, ITickListener listener, string name,
+            CancellationToken cancellationToken)
+        {
+            var periodicStopwatch = new PeriodicStopwatch(name, this, periodInMilliseconds, listener, cancellationToken);
+            _periodicStopwatches.Add(periodicStopwatch);
+            periodicStopwatch.Start();
+            return periodicStopwatch;
+        }
+
         public IPeriodicStopwatchFactory GetPeriodicStopwatchFactory()
         {
             return new PeriodicStopwatchFactory(this, _cancellationToken);
