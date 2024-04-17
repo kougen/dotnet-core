@@ -18,6 +18,7 @@ namespace Implementation.Time
         private readonly ICollection<IPeriodicStopwatch> _periodicStopwatches;
         private bool _disposed;
         private readonly ICollection<ITickListener> _listeners;
+        private readonly string _name = Guid.NewGuid().ToString();
         
         public bool IsRunning => _stopwatch.IsRunning;
         public TimeSpan Elapsed { get; private set; }
@@ -44,7 +45,8 @@ namespace Implementation.Time
                 {
                     if (Elapsed.TotalMilliseconds > startedTime.TotalMilliseconds + periodInMilliseconds)
                     {
-                        listener.RaiseTick(0);
+                        listener.RaiseTick(this, _name, -1);
+                        listener.RaiseTick(-1);
                         break;
                     }
                 }
@@ -59,6 +61,7 @@ namespace Implementation.Time
                 {
                     if (Elapsed.TotalMilliseconds > startedTime.TotalMilliseconds + periodInMilliseconds)
                     {
+                        listener.RaiseTick(this, _name, -1);
                         listener.RaiseTick(-1);
                         break;
                     }

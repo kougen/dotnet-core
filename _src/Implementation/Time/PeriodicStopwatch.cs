@@ -82,6 +82,7 @@ namespace Implementation.Time
                         foreach (var listener in _listeners)
                         {
                             listener.RaiseTick(_round);
+                            listener.RaiseTick(Parent, Name, _round);
                             listener.ElapsedTime = Elapsed;
                         }
 
