@@ -6,6 +6,5 @@ namespace Infrastructure.Time
     {
         void ChangePeriod(int periodInMilliseconds);
         void Resume();
-    
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Implementation.Time;
+using Implementation.Time.Factories;
 using Infrastructure.Time;
 using Infrastructure.Time.Listeners;
 using Moq;
@@ -23,6 +24,7 @@ namespace ImplementationTest.Time
             {
                 await stopwatch.WaitAsync(250, listenerMock.Object);
             }
+
             stopwatch.Stop();
             Assert.True(stopwatch.Elapsed.TotalMilliseconds > 2500);
             listenerMock.Verify(l => l.RaiseTick(-1), Times.Exactly(10));
@@ -34,7 +36,7 @@ namespace ImplementationTest.Time
             var cancellationTokenSource = new CancellationTokenSource();
             using IStopwatch stopwatch = new DefaultStopwatch(cancellationTokenSource.Token);
             Assert.NotNull(stopwatch);
-            
+
             var pWatchFactory = stopwatch.GetPeriodicStopwatchFactory();
             using var pWatch1 = pWatchFactory.CreatePeriodicStopwatch(900);
             var listenerMock1 = new Mock<ITickListener>();
