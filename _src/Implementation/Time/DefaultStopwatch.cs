@@ -105,11 +105,17 @@ namespace Implementation.Time
             }
         }
 
-        public void PeriodicOperation(int periodInMilliseconds, ITickListener listener, CancellationToken cancellationToken)
+        public IPeriodicStopwatch PeriodicOperation(int periodInMilliseconds, ITickListener listener, CancellationToken cancellationToken)
         {
             var periodicStopwatch = new PeriodicStopwatch(this, periodInMilliseconds, listener, cancellationToken);
             _periodicStopwatches.Add(periodicStopwatch);
             periodicStopwatch.Start();
+            return periodicStopwatch;
+        }
+        
+        public IPeriodicStopwatch PeriodicOperation(int periodInMilliseconds, ITickListener listener)
+        {
+            return PeriodicOperation(periodInMilliseconds, listener, _cancellationToken);
         }
 
         public IPeriodicStopwatchFactory GetPeriodicStopwatchFactory()
