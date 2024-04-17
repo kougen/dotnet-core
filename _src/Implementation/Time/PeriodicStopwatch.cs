@@ -18,10 +18,11 @@ namespace Implementation.Time
 
         public bool IsRunning => Parent.IsRunning;
         public IStopwatch Parent { get; }
-
+        public string Name { get; }
         public TimeSpan Elapsed { get; private set; }
 
-        public PeriodicStopwatch(IStopwatch parent, int periodInMilliseconds, ITickListener listener, CancellationToken cancellationToken)
+        public PeriodicStopwatch(string name, IStopwatch parent, int periodInMilliseconds, ITickListener listener,
+            CancellationToken cancellationToken)
         {
             Parent = parent ?? throw new ArgumentNullException(nameof(parent));
             _periodInMilliseconds = periodInMilliseconds;
@@ -29,15 +30,39 @@ namespace Implementation.Time
             _stopwatch = new Stopwatch();
             _listeners = new List<ITickListener>();
             _listeners.Add(listener);
+            Name = name;
         }
-        
-        public PeriodicStopwatch(IStopwatch parent, int periodInMilliseconds, CancellationToken cancellationToken)
+
+        public PeriodicStopwatch(string name, IStopwatch parent, int periodInMilliseconds, CancellationToken cancellationToken)
         {
             _periodInMilliseconds = periodInMilliseconds;
             _cancellationToken = cancellationToken;
             Parent = parent ?? throw new ArgumentNullException(nameof(parent));
             _stopwatch = new Stopwatch();
             _listeners = new List<ITickListener>();
+            Name = name;
+        }
+        
+        public PeriodicStopwatch(IStopwatch parent, int periodInMilliseconds, CancellationToken cancellationToken)
+        {
+            Parent = parent ?? throw new ArgumentNullException(nameof(parent));
+            _periodInMilliseconds = periodInMilliseconds;
+            _cancellationToken = cancellationToken;
+            _stopwatch = new Stopwatch();
+            _listeners = new List<ITickListener>();
+            Name = Guid.NewGuid().ToString();
+        }
+        
+        public PeriodicStopwatch(IStopwatch parent, int periodInMilliseconds, ITickListener listener,
+            CancellationToken cancellationToken)
+        {
+            Parent = parent ?? throw new ArgumentNullException(nameof(parent));
+            _periodInMilliseconds = periodInMilliseconds;
+            _cancellationToken = cancellationToken;
+            _stopwatch = new Stopwatch();
+            _listeners = new List<ITickListener>();
+            _listeners.Add(listener);
+            Name = Guid.NewGuid().ToString();
         }
 
         public void Start()
@@ -46,7 +71,7 @@ namespace Implementation.Time
             {
                 throw new InvalidOperationException("Parent stopwatch is not running");
             }
-            
+
             _stopwatch.Start();
             Task.Run(() =>
             {
@@ -59,6 +84,7 @@ namespace Implementation.Time
                             listener.RaiseTick(_round);
                             listener.ElapsedTime = Elapsed;
                         }
+
                         Elapsed += _stopwatch.Elapsed;
                         _stopwatch.Restart();
                         _round++;
@@ -66,7 +92,7 @@ namespace Implementation.Time
                 }
             }, _cancellationToken);
         }
-        
+
         public void ChangePeriod(int periodInMilliseconds)
         {
             _periodInMilliseconds = periodInMilliseconds;
