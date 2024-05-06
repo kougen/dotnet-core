@@ -28,3 +28,9 @@ var provider = collection.BuildServiceProvider();
 ```
 
 **Check the [Wiki](https://github.com/joshika39/cs-tools/wiki) for further details.**
+
+## Features
+- [x] `Console` functionalities
+- [x] `Json` functionalities
+- [x] `File` functionalities
+- [x] `String` functionalities
